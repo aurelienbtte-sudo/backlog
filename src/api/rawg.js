@@ -46,7 +46,11 @@ export async function details(id) {
   try {
     const movies = await call(`/games/${id}/movies`)
     const movie = movies.results?.[0]
-    if (movie) item.trailerVideo = movie.data?.max || movie.data?.['480']
+    if (movie) {
+      item.trailerVideo = movie.data?.max || movie.data?.['480']
+      // version légère pour la vidéo de fond de la fiche
+      item.trailerPreview = movie.data?.['480'] || movie.data?.max
+    }
   } catch {
     // pas de vidéo pour ce jeu
   }

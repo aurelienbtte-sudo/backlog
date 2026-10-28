@@ -9,6 +9,27 @@ import { TYPES, todayISO } from '../types.js'
 
 const duration = (ms) => (ms ? `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}` : '')
 
+// Jeux : l'extrait de la bande-annonce remplace l'image en fond, sans son et en boucle,
+// avec une copie floutée qui colore le haut de la page. Il apparaît en fondu, un peu après l'image.
+function HeroVideo({ src }) {
+  const [start, setStart] = useState(false)
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    setStart(false)
+    setReady(false)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const t = setTimeout(() => setStart(true), 1200)
+    return () => clearTimeout(t)
+  }, [src])
+  if (!start) return null
+  return (
+    <>
+      <video className={`hero-video-ambient ${ready ? 'on' : ''}`} src={src} muted loop playsInline autoPlay aria-hidden="true" />
+      <video className={`hero-video ${ready ? 'on' : ''}`} src={src} muted loop playsInline autoPlay aria-hidden="true" onPlaying={() => setReady(true)} />
+    </>
+  )
+}
+
 // Date complète au format français : 08/10/2025 (ou juste l'année si on n'a que ça)
 const formatDate = (d) => (d && d.length === 10 ? new Date(d + 'T12:00').toLocaleDateString('fr-FR') : d)
 
@@ -67,6 +88,7 @@ export default function Item() {
       <div className={`hero ${playing ? 'playing' : ''}`}>
         {heroImage && <div className="hero-ambient" style={{ backgroundImage: `url(${heroImage})` }} />}
         <div className={`hero-image ${heroImage ? '' : 'placeholder'} ${type === 'album' ? 'square' : ''}`} style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined} />
+        {type === 'jeu' && item.trailerPreview && !playing && <HeroVideo src={item.trailerPreview} />}
         {backButton}
         {playing && <TrailerPlayer item={item} onClose={() => setPlaying(false)} />}
         <div className="hero-content">
