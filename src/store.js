@@ -38,6 +38,14 @@ export function useStore(selector = (s) => s) {
 
 export const getState = () => state
 
+// Chaque modification faite par l'utilisateur est signalée ici (utilisé pour la synchro en ligne)
+const changeListeners = new Set()
+export function onChange(listener) {
+  changeListeners.add(listener)
+  return () => changeListeners.delete(listener)
+}
+const emit = (change) => changeListeners.forEach((l) => l(change))
+
 // On ne garde que l'essentiel d'une œuvre pour l'afficher sans rappeler l'API
 const slim = ({ id, type, sourceId, title, year, cover, subtitle }) => ({ id, type, sourceId, title, year, cover, subtitle })
 
@@ -54,11 +62,13 @@ export function updateEntry(item, patch) {
       entries: { ...s.entries, [item.id]: { ...prev, ...patch, item: slim(item), updatedAt: Date.now() } },
     }
   })
+  emit({ type: 'entry', entry: state.entries[item.id] })
 }
 
 export function addLog(item, { date, rating, review, liked, again }) {
   const log = { id: newId(), itemId: item.id, item: slim(item), date, rating, review, liked, again, createdAt: Date.now() }
   set((s) => ({ ...s, diary: [log, ...s.diary] }))
+  emit({ type: 'log', log })
   const patch = { done: true, wishlist: false, liked: liked || getState().entries[item.id]?.liked || false }
   if (rating) patch.rating = rating
   updateEntry(item, patch)
@@ -66,10 +76,12 @@ export function addLog(item, { date, rating, review, liked, again }) {
 
 export function removeLog(id) {
   set((s) => ({ ...s, diary: s.diary.filter((l) => l.id !== id) }))
+  emit({ type: 'removeLog', id })
 }
 
 export function setSetting(key, value) {
   set((s) => ({ ...s, settings: { ...s.settings, [key]: value } }))
+  if (key === 'name' || key === 'bio') emit({ type: 'profile' })
 }
 
 export function exportData() {
@@ -79,11 +91,19 @@ export function exportData() {
 export function importData(json) {
   const data = JSON.parse(json)
   if (typeof data !== 'object' || !data.entries || !Array.isArray(data.diary)) throw new Error('Fichier invalide')
-  set(() => ({ ...EMPTY, ...data }))
+  // Les réglages (clés API, compte) de cet appareil sont conservés
+  set((s) => ({ ...EMPTY, ...data, settings: { ...data.settings, ...s.settings } }))
+  emit({ type: 'all' })
 }
 
 export function resetData() {
   set((s) => ({ ...EMPTY, settings: s.settings }))
+  emit({ type: 'reset' })
+}
+
+// Remplace les notes et le journal sans déclencher de synchro (données venues du serveur)
+export function replaceData({ entries, diary }) {
+  set((s) => ({ ...s, entries, diary }))
 }
 
 // Tri du journal : plus récent d'abord

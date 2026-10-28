@@ -6,11 +6,13 @@ import { Grid } from '../components/MediaCard.jsx'
 import TypeTabs from '../components/TypeTabs.jsx'
 import DiaryRow from '../components/DiaryRow.jsx'
 import { TYPES, ARTIFACT } from '../types.js'
+import { SYNC_ENABLED, useSync } from '../sync.js'
 
 export default function Home() {
   const diary = useStore((s) => s.diary)
   const name = useStore((s) => s.settings.name)
   const lastBackupAt = useStore((s) => s.settings.lastBackupAt || 0)
+  const { ready, user } = useSync()
   const [type, setType] = useState('film')
   const [items, setItems] = useState([])
   const [error, setError] = useState(null)
@@ -30,7 +32,7 @@ export default function Home() {
 
   const recent = sortedDiary(diary).slice(0, 5)
   // Rappel : sauvegarder si on a des données et aucune sauvegarde depuis 30 jours
-  const needsBackup = !ARTIFACT && diary.length >= 3 && Date.now() - lastBackupAt > 30 * 24 * 3600 * 1000
+  const needsBackup = !ARTIFACT && !SYNC_ENABLED && diary.length >= 3 && Date.now() - lastBackupAt > 30 * 24 * 3600 * 1000
   const live = isLive(type) && type !== 'album'
 
   return (
@@ -39,6 +41,12 @@ export default function Home() {
         <h1>{name ? `Bon retour, ${name}.` : 'Garde une trace de tout ce que tu regardes, joues et écoutes.'}</h1>
         <p className="muted">Note, critique et organise tes films, séries, jeux vidéo et albums au même endroit.</p>
       </section>
+
+      {SYNC_ENABLED && ready && !user && (
+        <p className="notice">
+          <Link to="/reglages">Crée un compte gratuit</Link> pour sauvegarder tes notes en ligne et les retrouver sur tous tes appareils.
+        </p>
+      )}
 
       {needsBackup && (
         <p className="notice">

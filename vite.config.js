@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 // le reste du code est empaqueté dans un seul script, assemblé ensuite par scripts/build-artifact.mjs
 const artifact = {
   base: './',
+  resolve: { alias: { '@supabase/supabase-js': '/src/stub-supabase.js' } },
   esbuild: {
     jsx: 'transform',
     jsxFactory: 'React.createElement',

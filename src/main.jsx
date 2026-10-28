@@ -4,6 +4,7 @@ import { HashRouter, MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './styles.css'
 import { ARTIFACT } from './types.js'
+import './sync.js'
 
 // Dans un artefact, la navigation reste en mémoire (l'adresse de la page ne peut pas changer)
 const Router = ARTIFACT ? MemoryRouter : HashRouter

@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { useStore, setSetting, exportData, importData, resetData } from '../store.js'
 import ConfirmButton from '../components/ConfirmButton.jsx'
 import { ARTIFACT } from '../types.js'
+import Account from '../components/Account.jsx'
+import { SYNC_ENABLED } from '../sync.js'
 
 export default function Settings() {
   const settings = useStore((s) => s.settings)
@@ -50,6 +52,8 @@ export default function Settings() {
   return (
     <div className="settings">
       <h1>Réglages</h1>
+
+      {SYNC_ENABLED && <Account />}
 
       <section className="card-box">
         <h2>Profil</h2>
