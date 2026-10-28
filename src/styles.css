@@ -199,7 +199,7 @@ button.wide { width: 100%; }
 .item { position: relative; margin: -1.5rem calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; overflow-x: clip; background: var(--bg); padding-bottom: 3rem; }
 /* la fiche va jusqu'au pied de page : pas de marge où le fond teinté se verrait */
 .container:has(> .item) { padding-bottom: 0; }
-.hero { position: relative; min-height: min(68vh, 620px); display: flex; flex-direction: column; justify-content: flex-end; }
+.hero { position: relative; min-height: min(54vh, 500px); display: flex; flex-direction: column; justify-content: flex-end; }
 .hero-image {
   position: absolute; inset: 0;
   background-size: cover; background-position: center 20%;
