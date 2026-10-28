@@ -31,7 +31,16 @@ function normalize(type, r) {
 }
 
 const formatRuntime = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}` : `${min} min`)
-const countries = (r) => (r.production_countries || []).slice(0, 2).map((c) => c.name).join(', ')
+// TMDB donne les pays en anglais : on traduit à partir du code pays (US → États-Unis)
+const regionNames = typeof Intl.DisplayNames === 'function' ? new Intl.DisplayNames(['fr'], { type: 'region' }) : null
+const countryName = (c) => {
+  try {
+    return regionNames?.of(c.iso_3166_1) || c.name
+  } catch {
+    return c.name
+  }
+}
+const countries = (r) => (r.production_countries || []).slice(0, 2).map(countryName).join(', ')
 
 export async function search(type, query) {
   const data = await call(`/search/${KIND[type]}`, { query })
