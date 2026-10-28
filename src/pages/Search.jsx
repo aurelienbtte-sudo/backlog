@@ -13,7 +13,9 @@ export default function Search() {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState(null)
 
-  useEffect(() => setInput(q), [q])
+  useEffect(() => {
+    setInput(q)
+  }, [q])
 
   // On attend que l'utilisateur arrête de taper avant d'interroger l'API
   useEffect(() => {

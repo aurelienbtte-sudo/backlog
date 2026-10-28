@@ -15,7 +15,9 @@ import { ARTIFACT } from './types.js'
 export default function App() {
   const { pathname } = useLocation()
   // Chaque changement de page repart du haut de l'écran
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   return (
     <>
