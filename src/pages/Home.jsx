@@ -10,6 +10,7 @@ import { TYPES, ARTIFACT } from '../types.js'
 export default function Home() {
   const diary = useStore((s) => s.diary)
   const name = useStore((s) => s.settings.name)
+  const lastBackupAt = useStore((s) => s.settings.lastBackupAt || 0)
   const [type, setType] = useState('film')
   const [items, setItems] = useState([])
   const [error, setError] = useState(null)
@@ -28,6 +29,8 @@ export default function Home() {
   }, [type])
 
   const recent = sortedDiary(diary).slice(0, 5)
+  // Rappel : sauvegarder si on a des données et aucune sauvegarde depuis 30 jours
+  const needsBackup = !ARTIFACT && diary.length >= 3 && Date.now() - lastBackupAt > 30 * 24 * 3600 * 1000
   const live = isLive(type) && type !== 'album'
 
   return (
@@ -36,6 +39,12 @@ export default function Home() {
         <h1>{name ? `Bon retour, ${name}.` : 'Garde une trace de tout ce que tu regardes, joues et écoutes.'}</h1>
         <p className="muted">Note, critique et organise tes films, séries, jeux vidéo et albums au même endroit.</p>
       </section>
+
+      {needsBackup && (
+        <p className="notice">
+          Tes notes sont enregistrées sur cet appareil uniquement. <Link to="/reglages">Fais une sauvegarde</Link> de temps en temps pour ne rien perdre.
+        </p>
+      )}
 
       {recent.length > 0 && (
         <section>

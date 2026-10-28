@@ -22,11 +22,13 @@ export default function Settings() {
     a.download = `backlog-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(a.href)
+    setSetting('lastBackupAt', Date.now())
   }
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(exportData())
+      setSetting('lastBackupAt', Date.now())
       setMsg('Données copiées dans le presse-papiers ✔')
     } catch {
       setMsg('Copie impossible ici. Utilise le bouton Exporter.')
