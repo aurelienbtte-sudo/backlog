@@ -30,6 +30,9 @@ function normalize(type, r) {
   }
 }
 
+const formatRuntime = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}` : `${min} min`)
+const countries = (r) => (r.production_countries || []).slice(0, 2).map((c) => c.name).join(', ')
+
 export async function search(type, query) {
   const data = await call(`/search/${KIND[type]}`, { query })
   return data.results.map((r) => normalize(type, r))
@@ -41,7 +44,7 @@ export async function trending(type) {
 }
 
 export async function details(type, id) {
-  const r = await call(`/${KIND[type]}/${id}`, { append_to_response: 'credits' })
+  const r = await call(`/${KIND[type]}/${id}`, { append_to_response: 'credits,videos', include_video_language: 'fr,en,null' })
   const item = normalize(type, r)
   const crew = r.credits?.crew || []
   const directors = crew.filter((c) => c.job === 'Director').map((c) => c.name)
@@ -49,11 +52,17 @@ export async function details(type, id) {
   item.subtitle = (type === 'film' ? directors : creators).join(', ')
   item.genres = (r.genres || []).map((g) => g.name)
   item.backdrop = r.backdrop_path ? `${IMG}w1280${r.backdrop_path}` : null
+  item.posterLarge = r.poster_path ? `${IMG}w780${r.poster_path}` : null
+  item.released = r.release_date || r.first_air_date || ''
+  // Bande-annonce YouTube, en français si possible
+  const videos = (r.videos?.results || []).filter((v) => v.site === 'YouTube' && ['Trailer', 'Teaser'].includes(v.type))
+  const trailer = videos.find((v) => v.iso_639_1 === 'fr' && v.type === 'Trailer') || videos.find((v) => v.type === 'Trailer') || videos[0]
+  if (trailer) item.trailer = `https://www.youtube.com/watch?v=${trailer.key}`
   item.cast = (r.credits?.cast || []).slice(0, 10).map((c) => c.name)
   item.facts =
     type === 'film'
-      ? [r.runtime && `${r.runtime} min`, r.original_title !== r.title && r.original_title]
-      : [r.number_of_seasons && `${r.number_of_seasons} saison(s)`, r.number_of_episodes && `${r.number_of_episodes} épisodes`, r.status]
+      ? [r.runtime && formatRuntime(r.runtime), countries(r), r.original_title !== r.title && r.original_title]
+      : [r.number_of_seasons && `${r.number_of_seasons} saison${r.number_of_seasons > 1 ? 's' : ''}`, r.number_of_episodes && `${r.number_of_episodes} épisodes`, countries(r), r.networks?.[0]?.name]
   item.facts = item.facts.filter(Boolean)
   return item
 }

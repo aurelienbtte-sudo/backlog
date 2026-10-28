@@ -20,7 +20,8 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      {/* Sur la fiche d'une œuvre, l'image prend tout le haut de l'écran : pas d'en-tête */}
+      {!/^\/(film|serie|jeu|album)\//.test(pathname) && <Header />}
       <main className="container">
         <Routes>
           <Route path="/" element={<Profile />} />

@@ -40,6 +40,8 @@ export async function details(id) {
   item.overview = r.description_raw
   item.genres = (r.genres || []).map((g) => g.name)
   item.backdrop = r.background_image
+  item.posterLarge = r.background_image
+  item.released = r.released || ''
   item.facts = [
     (r.platforms || []).map((p) => p.platform.name).join(', '),
     r.metacritic && `Metacritic ${r.metacritic}`,

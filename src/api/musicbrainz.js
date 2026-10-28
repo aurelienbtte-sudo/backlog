@@ -28,6 +28,8 @@ export async function details(id) {
   const r = await fetchJSON(`${BASE}/release-group/${id}?fmt=json&inc=artist-credits+genres+releases`)
   const item = normalize(r)
   item.cover = cover(id, 500)
+  item.posterLarge = cover(id, 1200)
+  item.released = r['first-release-date'] || ''
   item.genres = (r.genres || []).sort((a, b) => b.count - a.count).slice(0, 5).map((g) => g.name)
   item.facts = [r['primary-type'], ...(r['secondary-types'] || [])]
   // Liste des morceaux : on prend la première édition officielle de l'album
