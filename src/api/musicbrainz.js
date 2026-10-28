@@ -44,3 +44,46 @@ export async function details(id) {
   }
   return item
 }
+
+// Sélection de l'accueil : on retrouve chaque album démo dans MusicBrainz pour avoir sa vraie jaquette.
+// MusicBrainz limite à ~1 requête/seconde : on les fait une par une et on garde le résultat en cache.
+const CACHE_KEY = 'backlog:mb-featured'
+
+export async function featured(list, onProgress) {
+  let cache = {}
+  try {
+    cache = JSON.parse(localStorage.getItem(CACHE_KEY)) || {}
+  } catch {
+    // cache illisible : on repart de zéro
+  }
+  const items = [...list]
+  const notify = () => onProgress?.([...items]) !== false
+
+  for (let i = 0; i < list.length; i++) {
+    const { title, subtitle } = list[i]
+    const key = `${title}|${subtitle}`
+    if (!cache[key]) {
+      if (!notify()) return items // l'utilisateur a changé d'onglet : on arrête
+      try {
+        const esc = (s) => s.replace(/"/g, '\\"')
+        const q = `releasegroup:"${esc(title)}" AND artist:"${esc(subtitle)}"`
+        const data = await fetchJSON(`${BASE}/release-group?fmt=json&limit=1&query=${encodeURIComponent(q)}`)
+        const found = data['release-groups'][0]
+        if (found) {
+          cache[key] = normalize(found)
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cache))
+          } catch {
+            // stockage indisponible : tant pis pour le cache
+          }
+        }
+      } catch {
+        // album introuvable ou réseau en panne : on garde la version démo
+      }
+      await new Promise((r) => setTimeout(r, 1100))
+    }
+    if (cache[key]) items[i] = cache[key]
+  }
+  notify()
+  return items
+}

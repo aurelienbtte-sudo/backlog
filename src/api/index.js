@@ -20,9 +20,11 @@ export function search(type, query) {
   return tmdb.search(type, query)
 }
 
-export function trending(type) {
-  // MusicBrainz ne propose pas de "tendances" : on montre la sélection démo
-  if (!isLive(type) || type === 'album') return Promise.resolve(DEMO[type])
+// onProgress (facultatif) reçoit la liste au fur et à mesure qu'elle se complète
+export function trending(type, onProgress) {
+  if (!isLive(type)) return Promise.resolve(DEMO[type])
+  // MusicBrainz ne propose pas de "tendances" : on enrichit la sélection démo avec les vraies jaquettes
+  if (type === 'album') return mb.featured(DEMO.album, onProgress)
   if (type === 'jeu') return rawg.trending()
   return tmdb.trending(type)
 }

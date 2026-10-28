@@ -17,7 +17,11 @@ export default function Home() {
   useEffect(() => {
     let alive = true
     setError(null)
-    trending(type)
+    setItems([])
+    trending(type, (partial) => {
+      if (!alive) return false
+      setItems(partial)
+    })
       .then((r) => alive && setItems(r))
       .catch((e) => alive && setError(e.message))
     return () => { alive = false }
