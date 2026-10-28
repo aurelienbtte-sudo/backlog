@@ -8,43 +8,6 @@ import { TYPES, todayISO } from '../types.js'
 
 const duration = (ms) => (ms ? `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}` : '')
 
-// iOS 26 peint une bande opaque derrière l'heure, de la couleur de fond de la page.
-// Sur une fiche, on donne donc au fond la couleur du haut de l'image pour que la bande s'y fonde.
-function useTopColor(src) {
-  useEffect(() => {
-    if (!src) return
-    let cancelled = false
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      if (cancelled) return
-      try {
-        const canvas = document.createElement('canvas')
-        canvas.width = 8
-        canvas.height = 1
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, img.naturalWidth, Math.max(1, img.naturalHeight * 0.04), 0, 0, 8, 1)
-        const px = ctx.getImageData(0, 0, 8, 1).data
-        let r = 0, g = 0, b = 0
-        for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2] }
-        const color = `rgb(${Math.round(r / 8)}, ${Math.round(g / 8)}, ${Math.round(b / 8)})`
-        document.documentElement.style.backgroundColor = color
-        document.body.style.backgroundColor = color
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
-      } catch {
-        // image sans autorisation de lecture (CORS) : on garde la couleur par défaut
-      }
-    }
-    img.src = src
-    return () => {
-      cancelled = true
-      document.documentElement.style.backgroundColor = ''
-      document.body.style.backgroundColor = ''
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#1c2228')
-    }
-  }, [src])
-}
-
 // Date complète au format français : 08/10/2025 (ou juste l'année si on n'a que ça)
 const formatDate = (d) => (d && d.length === 10 ? new Date(d + 'T12:00').toLocaleDateString('fr-FR') : d)
 
@@ -55,7 +18,6 @@ export default function Item() {
   const [error, setError] = useState(null)
   const [showPoster, setShowPoster] = useState(false)
   const [writing, setWriting] = useState(false)
-  useTopColor(item ? item.backdrop || item.posterLarge || item.cover : null)
 
   useEffect(() => {
     let alive = true
