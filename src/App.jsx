@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import TabBar from './components/TabBar.jsx'
 import Browse from './pages/Browse.jsx'
-import Home from './pages/Home.jsx'
 import Search from './pages/Search.jsx'
 import Item from './pages/Item.jsx'
 import Diary from './pages/Diary.jsx'
@@ -24,7 +23,7 @@ export default function App() {
       <Header />
       <main className="container">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Profile />} />
           <Route path="/jeux" element={<Browse key="jeux" title="Jeux" types={['jeu']} />} />
           <Route path="/cinema" element={<Browse key="cinema" title="Cinéma" types={['film', 'serie']} />} />
           <Route path="/musique" element={<Browse key="musique" title="Musique" types={['album']} />} />
