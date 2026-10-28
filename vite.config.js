@@ -14,6 +14,8 @@ const artifact = {
   },
   build: {
     outDir: 'dist-artifact',
+    // version artefact : tout (logo compris) doit tenir dans une seule page
+    assetsInlineLimit: 100000,
     cssCodeSplit: false,
     rollupOptions: {
       input: 'src/main.jsx',

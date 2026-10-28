@@ -58,13 +58,8 @@ button.wide { width: 100%; }
 /* En-tête */
 .header { background: var(--bg-2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; padding-top: env(safe-area-inset-top, 0px); }
 .header-inner { max-width: 1100px; margin: 0 auto; padding: .7rem 16px; display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
-.logo { font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: .5rem; }
-.dots { display: inline-flex; gap: 3px; }
-.dots i { width: 11px; height: 11px; border-radius: 50%; }
-.dots i:nth-child(1) { background: var(--film); }
-.dots i:nth-child(2) { background: var(--serie); }
-.dots i:nth-child(3) { background: var(--jeu); }
-.dots i:nth-child(4) { background: var(--album); }
+.logo { display: flex; align-items: center; }
+.logo img { height: 44px; width: auto; display: block; }
 .header-icon { display: grid; place-items: center; width: 44px; height: 44px; color: var(--muted); border-radius: 50%; }
 .header-icon:hover { color: #fff; background: var(--bg-3); }
 .header-icon { margin-left: auto; }

@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
+import logo from '../assets/logo.svg'
 
 export default function Header() {
   return (
     <header className="header">
       <div className="header-inner">
         <Link to="/" className="logo">
-          <span className="dots"><i /><i /><i /><i /></span> Backlog
+          <img src={logo} alt="Pop up" />
         </Link>
         <Link to="/reglages" className="header-icon" aria-label="Réglages" title="Réglages">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
