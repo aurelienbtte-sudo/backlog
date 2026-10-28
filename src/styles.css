@@ -201,8 +201,6 @@ button.wide { width: 100%; }
 /* pendant la vidéo, l'affiche s'efface pour un fond noir, éclairé par le halo de la vidéo */
 .hero.playing .hero-image, .hero.playing .hero-ambient { opacity: 0; }
 .hero.playing { background: linear-gradient(to bottom, #000 0%, #000 70%, var(--bg) 100%); }
-.trailer-glow { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 16 / 9; z-index: 0; pointer-events: none; }
-.trailer-glow video { width: 100%; height: 100%; object-fit: cover; filter: blur(42px) saturate(1.8) brightness(1.1); transform: scale(1.25); opacity: .85; }
 .trailer-frame { position: relative; z-index: 1; }
 .trailer-tools { position: relative; z-index: 1; }
 .trailer { position: absolute; z-index: 4; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 64px); max-width: 900px; margin: 0 auto; }
