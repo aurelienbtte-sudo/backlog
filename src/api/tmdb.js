@@ -66,7 +66,10 @@ export async function details(type, id) {
   // Bande-annonce YouTube, en français si possible
   const videos = (r.videos?.results || []).filter((v) => v.site === 'YouTube' && ['Trailer', 'Teaser'].includes(v.type))
   const trailer = videos.find((v) => v.iso_639_1 === 'fr' && v.type === 'Trailer') || videos.find((v) => v.type === 'Trailer') || videos[0]
-  if (trailer) item.trailer = `https://www.youtube.com/watch?v=${trailer.key}`
+  if (trailer) {
+    item.trailer = `https://www.youtube.com/watch?v=${trailer.key}`
+    item.trailerKey = trailer.key
+  }
   item.cast = (r.credits?.cast || []).slice(0, 10).map((c) => c.name)
   item.facts =
     type === 'film'

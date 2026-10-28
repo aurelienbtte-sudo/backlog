@@ -42,6 +42,14 @@ export async function details(id) {
   item.backdrop = r.background_image
   item.posterLarge = r.background_image
   item.released = r.released || ''
+  // Bande-annonce : RAWG fournit parfois un vrai fichier vidéo
+  try {
+    const movies = await call(`/games/${id}/movies`)
+    const movie = movies.results?.[0]
+    if (movie) item.trailerVideo = movie.data?.max || movie.data?.['480']
+  } catch {
+    // pas de vidéo pour ce jeu
+  }
   item.facts = [
     (r.platforms || []).map((p) => p.platform.name).join(', '),
     r.metacritic && `Metacritic ${r.metacritic}`,

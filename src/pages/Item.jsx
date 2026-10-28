@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getItem } from '../api/index.js'
 import { useStore, updateEntry, addLog, removeLog, sortedDiary } from '../store.js'
 import DiaryRow from '../components/DiaryRow.jsx'
+import TrailerPlayer from '../components/TrailerPlayer.jsx'
 import { StarRating } from '../components/Stars.jsx'
 import { TYPES, todayISO } from '../types.js'
 
@@ -18,12 +19,14 @@ export default function Item() {
   const [error, setError] = useState(null)
   const [showPoster, setShowPoster] = useState(false)
   const [writing, setWriting] = useState(false)
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     let alive = true
     setItem(null)
     setError(null)
     setWriting(false)
+    setPlaying(false)
     getItem(type, sourceId)
       .then((i) => alive && setItem(i))
       .catch((e) => alive && setError(e.message))
@@ -61,10 +64,11 @@ export default function Item() {
   return (
     <article className="item" style={{ '--hue': hue, '--accent': TYPES[type].color }}>
       {/* Grande image en haut, qui se fond dans la page ; une copie floutée colore le fond en dessous */}
-      <div className="hero">
+      <div className={`hero ${playing ? 'playing' : ''}`}>
         {heroImage && <div className="hero-ambient" style={{ backgroundImage: `url(${heroImage})` }} />}
         <div className={`hero-image ${heroImage ? '' : 'placeholder'} ${type === 'album' ? 'square' : ''}`} style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined} />
         {backButton}
+        {playing && <TrailerPlayer item={item} onClose={() => setPlaying(false)} />}
         <div className="hero-content">
           <h1 className="hero-title">{item.title}</h1>
           <p className="hero-sub">
@@ -72,9 +76,15 @@ export default function Item() {
           </p>
           <div className="hero-buttons">
             <button className="glass-btn" onClick={scrollToReviews}>Critiques</button>
-            <a className="glass-btn" href={trailer} target="_blank" rel="noreferrer">
-              {type === 'album' ? 'Écouter' : 'Bande-annonce'}
-            </a>
+            {item.trailerKey || item.trailerVideo ? (
+              <button className="glass-btn" onClick={() => setPlaying(!playing)}>
+                {playing ? 'Fermer la vidéo' : 'Bande-annonce'}
+              </button>
+            ) : (
+              <a className="glass-btn" href={trailer} target="_blank" rel="noreferrer">
+                {type === 'album' ? 'Écouter' : 'Bande-annonce'}
+              </a>
+            )}
             {poster && <button className="glass-btn" onClick={() => setShowPoster(true)}>{type === 'album' ? 'Pochette' : 'Affiche'}</button>}
           </div>
         </div>
