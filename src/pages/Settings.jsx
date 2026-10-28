@@ -1,9 +1,25 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore, setSetting, exportData, importData, resetData } from '../store.js'
 import ConfirmButton from '../components/ConfirmButton.jsx'
 import { ARTIFACT } from '../types.js'
 import Account from '../components/Account.jsx'
 import { SYNC_ENABLED } from '../sync.js'
+
+// Petit diagnostic d'affichage (utile pour vérifier le mode plein écran sur iPhone)
+function DisplayInfo() {
+  const [info, setInfo] = useState('')
+  useEffect(() => {
+    const probe = document.createElement('div')
+    probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);visibility:hidden'
+    document.body.appendChild(probe)
+    const inset = Math.round(probe.getBoundingClientRect().height)
+    probe.remove()
+    const standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches
+    const meta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.content
+    setInfo(`${standalone ? 'Appli écran d’accueil' : 'Navigateur'} · zone du haut : ${inset} px · barre d’état : ${meta} · écran ${window.innerWidth}×${window.innerHeight}`)
+  }, [])
+  return <p className="muted small">{info}</p>
+}
 
 export default function Settings() {
   const settings = useStore((s) => s.settings)
@@ -87,6 +103,7 @@ export default function Settings() {
         </div>
         {msg && <p className="small">{msg}</p>}
       </section>
+      <DisplayInfo />
     </div>
   )
 }
