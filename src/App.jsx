@@ -1,5 +1,8 @@
-import { Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header.jsx'
+import TabBar from './components/TabBar.jsx'
+import Browse from './pages/Browse.jsx'
 import Home from './pages/Home.jsx'
 import Search from './pages/Search.jsx'
 import Item from './pages/Item.jsx'
@@ -10,12 +13,19 @@ import Settings from './pages/Settings.jsx'
 import { ARTIFACT } from './types.js'
 
 export default function App() {
+  const { pathname } = useLocation()
+  // Chaque changement de page repart du haut de l'écran
+  useEffect(() => window.scrollTo(0, 0), [pathname])
+
   return (
     <>
       <Header />
       <main className="container">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/jeux" element={<Browse key="jeux" title="Jeux" types={['jeu']} />} />
+          <Route path="/cinema" element={<Browse key="cinema" title="Cinéma" types={['film', 'serie']} />} />
+          <Route path="/musique" element={<Browse key="musique" title="Musique" types={['album']} />} />
           <Route path="/recherche" element={<Search />} />
           <Route path="/journal" element={<Diary />} />
           <Route path="/a-decouvrir" element={<Watchlist />} />
@@ -30,6 +40,7 @@ export default function App() {
           ? 'Version d\'essai avec un catalogue de démonstration. Tes notes restent dans ce navigateur.'
           : 'Données : TMDB · RAWG · MusicBrainz. Ce produit utilise l\'API TMDB sans être approuvé ni certifié par TMDB.'}
       </footer>
+      <TabBar />
     </>
   )
 }

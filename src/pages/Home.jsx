@@ -1,46 +1,27 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { trending, isLive } from '../api/index.js'
 import { useStore, sortedDiary } from '../store.js'
-import { Grid } from '../components/MediaCard.jsx'
-import TypeTabs from '../components/TypeTabs.jsx'
 import DiaryRow from '../components/DiaryRow.jsx'
-import { TYPES, ARTIFACT } from '../types.js'
+import { ARTIFACT } from '../types.js'
 import { SYNC_ENABLED, useSync } from '../sync.js'
 
+// Onglet « Accueil » : ton espace perso (activité, journal, liste, statistiques)
 export default function Home() {
   const diary = useStore((s) => s.diary)
+  const entries = useStore((s) => s.entries)
   const name = useStore((s) => s.settings.name)
   const lastBackupAt = useStore((s) => s.settings.lastBackupAt || 0)
   const { ready, user } = useSync()
-  const [type, setType] = useState('film')
-  const [items, setItems] = useState([])
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    let alive = true
-    setError(null)
-    setItems([])
-    trending(type, (partial) => {
-      if (!alive) return false
-      setItems(partial)
-    })
-      .then((r) => alive && setItems(r))
-      .catch((e) => alive && setError(e.message))
-    return () => { alive = false }
-  }, [type])
 
   const recent = sortedDiary(diary).slice(0, 5)
   // Rappel : sauvegarder si on a des données et aucune sauvegarde depuis 30 jours
   const needsBackup = !ARTIFACT && !SYNC_ENABLED && diary.length >= 3 && Date.now() - lastBackupAt > 30 * 24 * 3600 * 1000
-  const live = isLive(type) && type !== 'album'
+  const all = Object.values(entries)
+  const wishlist = all.filter((e) => e.wishlist && !e.done).length
+  const done = all.filter((e) => e.done).length
 
   return (
     <>
-      <section className="hero">
-        <h1>{name ? `Bon retour, ${name}.` : 'Garde une trace de tout ce que tu regardes, joues et écoutes.'}</h1>
-        <p className="muted">Note, critique et organise tes films, séries, jeux vidéo et albums au même endroit.</p>
-      </section>
+      <h1 className="page-title">{name ? `Salut ${name}` : 'Accueil'}</h1>
 
       {SYNC_ENABLED && ready && !user && (
         <p className="notice">
@@ -54,31 +35,33 @@ export default function Home() {
         </p>
       )}
 
-      {recent.length > 0 && (
-        <section>
-          <div className="section-head">
-            <h2>Activité récente</h2>
-            <Link to="/journal">Tout le journal →</Link>
-          </div>
-          <div className="diary">{recent.map((l) => <DiaryRow key={l.id} log={l} />)}</div>
-        </section>
-      )}
+      <div className="shortcuts">
+        <Link to="/journal" className="shortcut" style={{ '--accent': 'var(--film)' }}>
+          <strong>{diary.length}</strong>
+          <span>Journal</span>
+        </Link>
+        <Link to="/a-decouvrir" className="shortcut" style={{ '--accent': 'var(--jeu)' }}>
+          <strong>{wishlist}</strong>
+          <span>À découvrir</span>
+        </Link>
+        <Link to="/profil" className="shortcut" style={{ '--accent': 'var(--album)' }}>
+          <strong>{done}</strong>
+          <span>Profil et stats</span>
+        </Link>
+      </div>
 
       <section>
         <div className="section-head">
-          <h2>{live ? 'Populaire en ce moment' : 'Sélection'}</h2>
+          <h2>Activité récente</h2>
+          {recent.length > 0 && <Link to="/journal">Tout le journal →</Link>}
         </div>
-        <TypeTabs value={type} onChange={setType} />
-        {ARTIFACT && (
-          <p className="notice">Version d'essai : choisis parmi {items.length} {TYPES[type].label.toLowerCase()} de démonstration, ou utilise la recherche.</p>
-        )}
-        {!ARTIFACT && !isLive(type) && (
-          <p className="notice">
-            Mode démo pour les {TYPES[type].label.toLowerCase()}. <Link to="/reglages">Ajoute une clé API gratuite</Link> pour accéder au catalogue complet.
+        {recent.length > 0 ? (
+          <div className="diary">{recent.map((l) => <DiaryRow key={l.id} log={l} />)}</div>
+        ) : (
+          <p className="muted">
+            Rien pour l'instant. Choisis un onglet en bas (Jeux, Cinéma ou Musique), ouvre une œuvre et ajoute-la à ton journal.
           </p>
         )}
-        {!ARTIFACT && type === 'album' && <p className="muted small">Pour la musique, utilise la recherche pour trouver n'importe quel album.</p>}
-        {error ? <p className="error">{error}</p> : <Grid items={ARTIFACT ? items : items.slice(0, 18)} />}
       </section>
     </>
   )
