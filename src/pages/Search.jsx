@@ -2,54 +2,53 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { search } from '../api/index.js'
 import { Grid } from '../components/MediaCard.jsx'
-import TypeTabs from '../components/TypeTabs.jsx'
+import { TYPES, TYPE_KEYS } from '../types.js'
 
+// Résultats de la barre de recherche : films, séries, jeux et musique en même temps
 export default function Search() {
-  const [params, setParams] = useSearchParams()
-  const q = params.get('q') || ''
-  const type = params.get('type') || 'film'
-  const [input, setInput] = useState(q)
-  const [results, setResults] = useState([])
-  const [status, setStatus] = useState('idle')
-  const [error, setError] = useState(null)
+  const [params] = useSearchParams()
+  const q = (params.get('q') || '').trim()
+  const [results, setResults] = useState({})
 
   useEffect(() => {
-    setInput(q)
+    if (!q) {
+      setResults({})
+      return
+    }
+    let alive = true
+    setResults(Object.fromEntries(TYPE_KEYS.map((t) => [t, { status: 'loading' }])))
+    TYPE_KEYS.forEach((t) =>
+      search(t, q)
+        .then((items) => alive && setResults((r) => ({ ...r, [t]: { status: 'done', items } })))
+        .catch((e) => alive && setResults((r) => ({ ...r, [t]: { status: 'error', error: e.message } })))
+    )
+    return () => {
+      alive = false
+    }
   }, [q])
 
-  // On attend que l'utilisateur arrête de taper avant d'interroger l'API
-  useEffect(() => {
-    const t = setTimeout(() => {
-      if (input !== q) setParams({ q: input, type }, { replace: true })
-    }, 400)
-    return () => clearTimeout(t)
-  }, [input])
-
-  useEffect(() => {
-    if (!q.trim()) { setResults([]); setStatus('idle'); return }
-    let alive = true
-    setStatus('loading')
-    search(type, q.trim())
-      .then((r) => { if (alive) { setResults(r); setStatus('done') } })
-      .catch((e) => { if (alive) { setError(e.message); setStatus('error') } })
-    return () => { alive = false }
-  }, [q, type])
+  const all = Object.values(results)
+  const nothing = q && all.length && all.every((r) => r.status === 'done' && !r.items.length)
 
   return (
     <>
-      <h1>Recherche</h1>
-      <input
-        className="big-input"
-        type="search"
-        autoFocus
-        placeholder="Titre, réalisateur, artiste…"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <TypeTabs value={type} onChange={(t) => setParams({ q: input, type: t })} />
-      {status === 'loading' && <p className="muted">Recherche…</p>}
-      {status === 'error' && <p className="error">{error}</p>}
-      {status === 'done' && <Grid items={results} empty={`Aucun résultat pour « ${q} ».`} />}
+      <h1 className="page-title">Recherche</h1>
+      {!q && <p className="muted">Tape le nom d'un film, d'une série, d'un jeu ou d'un album dans la barre en bas.</p>}
+      {nothing && <p className="muted">Aucun résultat pour « {q} ».</p>}
+      {TYPE_KEYS.map((t) => {
+        const r = results[t]
+        if (!r || (r.status === 'done' && !r.items.length)) return null
+        return (
+          <section key={t}>
+            <div className="section-head">
+              <h2>{TYPES[t].label}</h2>
+            </div>
+            {r.status === 'loading' && <p className="muted">Recherche…</p>}
+            {r.status === 'error' && <p className="error">{r.error}</p>}
+            {r.status === 'done' && <Grid items={r.items.slice(0, 9)} />}
+          </section>
+        )
+      })}
     </>
   )
 }

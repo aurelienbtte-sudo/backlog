@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import TabBar from './components/TabBar.jsx'
+import SearchBar from './components/SearchBar.jsx'
 import Browse from './pages/Browse.jsx'
 import Search from './pages/Search.jsx'
 import Item from './pages/Item.jsx'
@@ -42,6 +43,7 @@ export default function App() {
           ? 'Version d\'essai avec un catalogue de démonstration. Tes notes restent dans ce navigateur.'
           : 'Données : TMDB · RAWG · MusicBrainz. Ce produit utilise l\'API TMDB sans être approuvé ni certifié par TMDB.'}
       </footer>
+      <SearchBar />
       <TabBar />
     </>
   )

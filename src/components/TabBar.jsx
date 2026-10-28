@@ -14,10 +14,9 @@ const ITEMS = [
     color: 'var(--serie)',
     match: (p) => p === '/' || ['/journal', '/a-decouvrir', '/profil', '/reglages'].includes(p),
   },
-  { to: '/recherche', label: 'Rechercher', search: true, color: '#fff', match: (p) => p === '/recherche' },
 ]
 
-const SearchIcon = () => (
+export const SearchIcon = () => (
   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
     <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.2" />
     <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
@@ -133,7 +132,17 @@ export default function TabBar() {
           style={{ left: lens.left, top: lens.top, width: lens.width, height: lens.height }}
         >
           {/* Copie des onglets, alignée sur la vraie barre : grossie avec la loupe, elle donne l'effet de verre bombé */}
-          <div className="tab-lens-content" style={{ left: -lens.left, top: -lens.top, width: layout.width, height: layout.height }}>
+          <div
+            className="tab-lens-content"
+            style={{
+              left: -lens.left,
+              top: -lens.top,
+              width: layout.width,
+              height: layout.height,
+              // le contenu est un peu « dé-zoomé » pour que la bulle grossisse moins que sa propre taille
+              transformOrigin: `${lens.left + lens.width / 2}px ${lens.top + lens.height / 2}px`,
+            }}
+          >
             <Labels highlighted={highlighted} />
           </div>
         </div>

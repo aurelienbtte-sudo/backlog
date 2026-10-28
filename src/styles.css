@@ -67,8 +67,7 @@ button.wide { width: 100%; }
 .dots i:nth-child(4) { background: var(--album); }
 .header-icon { display: grid; place-items: center; width: 44px; height: 44px; color: var(--muted); border-radius: 50%; }
 .header-icon:hover { color: #fff; background: var(--bg-3); }
-.header-search { margin-left: auto; }
-.header-search input { width: 220px; border-radius: 99px; }
+.header-icon { margin-left: auto; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 16px 3rem; }
 .footer { background: var(--bg);  text-align: center; color: var(--muted); font-size: .75rem; padding: 2rem 16px; border-top: 1px solid var(--border); }
@@ -77,7 +76,7 @@ button.wide { width: 100%; }
 
 /* Barre d'onglets flottante (maquette Figma, style Liquid Glass d'iOS) */
 /* espace sous le contenu pour ne pas être caché par la barre d'onglets */
-.footer { padding-bottom: calc(2rem + 96px + env(safe-area-inset-bottom, 0px)); }
+.footer { padding-bottom: calc(2rem + 150px + env(safe-area-inset-bottom, 0px)); }
 .tabbar {
   position: fixed; z-index: 20;
   left: 50%; transform: translateX(-50%);
@@ -134,11 +133,30 @@ button.wide { width: 100%; }
     transform .3s cubic-bezier(.3, 1.6, .5, 1),
     background .2s, box-shadow .2s;
 }
-.tabbar.dragging .tab-lens-content { opacity: 1; }
+.tabbar.dragging .tab-lens-content { opacity: 1; transform: scale(.8); }
 @media (prefers-reduced-motion: reduce) {
   .tab-lens, .tabbar.dragging .tab-lens { transition: none; }
 }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Barre de recherche flottante, au-dessus de la barre d'onglets */
+.searchbar {
+  position: fixed; z-index: 20;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(10px + 60px + 16px + env(safe-area-inset-bottom, 0px));
+  width: min(calc(100% - 24px), 520px); height: 44px;
+  display: flex; align-items: center; gap: .55rem; padding: 0 .5rem 0 1rem;
+  border-radius: 999px; color: var(--text);
+  background: rgba(30, 34, 40, .72);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+}
+.searchbar svg { flex: none; opacity: .85; }
+.searchbar input { flex: 1; min-width: 0; height: 100%; padding: 0; background: none; border: 0; border-radius: 0; font-size: 16px; color: var(--text); outline: none; }
+.searchbar input::-webkit-search-cancel-button { display: none; }
+.searchbar:focus-within { border-color: rgba(255, 255, 255, .35); }
+.searchbar-clear { flex: none; width: 32px; height: 32px; padding: 0; border-radius: 50%; background: rgba(255, 255, 255, .14); font-size: .8rem; }
 
 /* Choix Films / Séries, façon contrôle segmenté iOS */
 .segmented { display: flex; background: var(--bg-3); border-radius: 10px; padding: 3px; margin-bottom: 1rem; max-width: 420px; }
@@ -319,8 +337,6 @@ button.wide { width: 100%; }
 }
 @media (max-width: 600px) {
   .header-inner { gap: .6rem; }
-  .header-search { display: none; }
-  .header-icon { margin-left: auto; }
   .shortcut { padding: .8rem; }
   .shortcut strong { font-size: 1.5rem; }
   .tab { font-size: .85rem; }
