@@ -80,7 +80,7 @@ button.wide { width: 100%; }
 .tabbar {
   position: fixed; z-index: 20;
   left: 50%; transform: translateX(-50%);
-  bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) - 12px));
+  bottom: max(6px, calc(env(safe-area-inset-bottom, 0px) - 18px));
   width: min(calc(100% - 24px), 520px);
   display: flex; align-items: center; gap: 2px; padding: 5px;
   border-radius: 999px;
@@ -141,7 +141,7 @@ button.wide { width: 100%; }
 .searchbar {
   position: fixed; z-index: 20;
   left: 50%; transform: translateX(-50%);
-  bottom: calc(max(8px, calc(env(safe-area-inset-bottom, 0px) - 12px)) + 60px + 8px);
+  bottom: calc(max(6px, calc(env(safe-area-inset-bottom, 0px) - 18px)) + 60px + 5px);
   width: min(calc(100% - 24px), 520px); height: 44px;
   display: flex; align-items: center; gap: .55rem; padding: 0 .5rem 0 1rem;
   border-radius: 999px; color: var(--text);
