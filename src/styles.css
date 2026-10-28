@@ -117,7 +117,7 @@ button.wide { width: 100%; }
 .tab-lens-content { position: absolute; display: flex; align-items: center; gap: 2px; padding: 5px; opacity: 0; transition: opacity .15s; }
 .tabbar.dragging .tab-lens {
   z-index: 3;
-  transform: scale(1.45);
+  transform: scale(1.12);
   background: rgba(58, 66, 78, .9);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -131,7 +131,7 @@ button.wide { width: 100%; }
     transform .3s cubic-bezier(.3, 1.6, .5, 1),
     background .2s, box-shadow .2s;
 }
-.tabbar.dragging .tab-lens-content { opacity: 1; transform: scale(.8); }
+.tabbar.dragging .tab-lens-content { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .tab-lens, .tabbar.dragging .tab-lens { transition: none; }
 }
