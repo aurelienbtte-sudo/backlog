@@ -45,7 +45,7 @@ export default function Search() {
             </div>
             {r.status === 'loading' && <p className="muted">Recherche…</p>}
             {r.status === 'error' && <p className="error">{r.error}</p>}
-            {r.status === 'done' && <Grid items={r.items.slice(0, 9)} />}
+            {r.status === 'done' && <Grid items={r.items.slice(0, 12)} />}
           </section>
         )
       })}

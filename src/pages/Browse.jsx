@@ -29,7 +29,7 @@ export default function Browse({ title, types }) {
   const seen = new Set()
   const mine = sortedDiary(diary)
     .filter((l) => types.includes(l.item.type) && !seen.has(l.itemId) && seen.add(l.itemId))
-    .slice(0, 6)
+    .slice(0, 8)
     .map((l) => l.item)
 
   const live = isLive(type) && type !== 'album'
@@ -70,7 +70,7 @@ export default function Browse({ title, types }) {
             Mode démo pour les {TYPES[type].label.toLowerCase()}. <Link to="/reglages">Ajoute une clé API gratuite</Link> pour accéder au catalogue complet.
           </p>
         )}
-        {error ? <p className="error">{error}</p> : <Grid items={ARTIFACT ? items : items.slice(0, 18)} />}
+        {error ? <p className="error">{error}</p> : <Grid items={ARTIFACT ? items : items.slice(0, 20)} />}
       </section>
     </>
   )

@@ -338,7 +338,15 @@ button.wide { width: 100%; }
   .shortcut { padding: .8rem; }
   .shortcut strong { font-size: 1.5rem; }
   .tab { font-size: .85rem; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem .6rem; }
+  /* téléphone : toujours 4 affiches par ligne */
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem .5rem; }
+  .card-meta { font-size: .72rem; }
+  .card-meta strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .grid .placeholder { padding: .35rem; }
+  .grid .ph-icon { font-size: 1rem; }
+  .grid .ph-title { font-size: .62rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta span { font-size: .66rem; }
+  .card-badges { font-size: .66rem; gap: .25rem; }
   .diary-row { grid-template-columns: 50px 1fr auto; }
   .diary-date { grid-column: 1 / -1; padding: 0; }
 }
