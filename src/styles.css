@@ -13,6 +13,8 @@
   --star: #00e054;
   --heart: #ff6b5f;
   --radius: 6px;
+  --brand: #e5223a;
+  --brand-ink: #690722;
   color-scheme: dark;
 }
 
@@ -56,12 +58,12 @@ button.wide { width: 100%; }
 .icon-btn { background: none; color: var(--muted); padding: .25rem .5rem; }
 
 /* En-tête */
-.header { background: var(--bg-2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; padding-top: env(safe-area-inset-top, 0px); }
+.header { background: var(--brand); border-bottom: 0; position: sticky; top: 0; z-index: 10; padding-top: env(safe-area-inset-top, 0px); }
 .header-inner { max-width: 1100px; margin: 0 auto; padding: .7rem 16px; display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
 .logo { display: flex; align-items: center; }
 .logo img { height: 44px; width: auto; display: block; }
-.header-icon { display: grid; place-items: center; width: 44px; height: 44px; color: var(--muted); border-radius: 50%; }
-.header-icon:hover { color: #fff; background: var(--bg-3); }
+.header-icon { display: grid; place-items: center; width: 44px; height: 44px; color: var(--brand-ink); border-radius: 50%; }
+.header-icon:hover { color: var(--brand-ink); background: rgba(255, 255, 255, .18); }
 .header-icon { margin-left: auto; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 16px 3rem; }
