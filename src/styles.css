@@ -71,12 +71,13 @@ button.wide { width: 100%; }
 .header-search input { width: 220px; border-radius: 99px; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 16px 3rem; }
-.footer { text-align: center; color: var(--muted); font-size: .75rem; padding: 2rem 16px; border-top: 1px solid var(--border); }
+.footer { background: var(--bg);  text-align: center; color: var(--muted); font-size: .75rem; padding: 2rem 16px; border-top: 1px solid var(--border); }
 
 .page-title { font-size: 2.125rem; font-weight: 800; letter-spacing: -.02em; margin: .5rem 0 1.2rem; }
 
 /* Barre d'onglets flottante (maquette Figma, style Liquid Glass d'iOS) */
-body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+/* espace sous le contenu pour ne pas être caché par la barre d'onglets */
+.footer { padding-bottom: calc(2rem + 96px + env(safe-area-inset-bottom, 0px)); }
 .tabbar {
   position: fixed; z-index: 20;
   left: 50%; transform: translateX(-50%);
@@ -195,7 +196,9 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .half:hover { background: rgba(255,255,255,.08); }
 
 /* Fiche d'une œuvre : grande image en haut qui se fond dans la page (maquette Figma) */
-.item { position: relative; margin: -1.5rem calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; overflow-x: clip; }
+.item { position: relative; margin: -1.5rem calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; overflow-x: clip; background: var(--bg); padding-bottom: 3rem; }
+/* la fiche va jusqu'au pied de page : pas de marge où le fond teinté se verrait */
+.container:has(> .item) { padding-bottom: 0; }
 .hero { position: relative; min-height: min(68vh, 620px); display: flex; flex-direction: column; justify-content: flex-end; }
 .hero-image {
   position: absolute; inset: 0;
