@@ -1,6 +1,7 @@
 // MusicBrainz + Cover Art Archive : albums, gratuit et sans clé — https://musicbrainz.org/doc/MusicBrainz_API
 // Limite : ~1 requête par seconde, on reste donc sobre.
 import { fetchJSON } from './keys.js'
+import { findAppleMusicAlbum } from './applemusic.js'
 
 const BASE = 'https://musicbrainz.org/ws/2'
 const cover = (id, size = 250) => `https://coverartarchive.org/release-group/${id}/front-${size}`
@@ -30,6 +31,11 @@ export async function details(id) {
   item.cover = cover(id, 500)
   item.posterLarge = cover(id, 1200)
   item.released = r['first-release-date'] || ''
+  try {
+    item.appleMusic = await findAppleMusicAlbum(item.title, item.subtitle)
+  } catch {
+    // Apple Music indisponible : le bouton ouvrira une recherche
+  }
   item.genres = (r.genres || []).sort((a, b) => b.count - a.count).slice(0, 5).map((g) => g.name)
   item.facts = [r['primary-type'], ...(r['secondary-types'] || [])]
   // Liste des morceaux : on prend la première édition officielle de l'album

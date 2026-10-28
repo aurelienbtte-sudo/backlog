@@ -4,6 +4,7 @@ import { getItem } from '../api/index.js'
 import { useStore, updateEntry, addLog, removeLog, sortedDiary } from '../store.js'
 import DiaryRow from '../components/DiaryRow.jsx'
 import TrailerPlayer from '../components/TrailerPlayer.jsx'
+import { appleMusicSearch } from '../api/applemusic.js'
 import { StarRating } from '../components/Stars.jsx'
 import { TYPES, todayISO } from '../types.js'
 
@@ -51,6 +52,7 @@ export default function Item() {
   const poster = item.posterLarge || item.cover
   const trailer =
     item.trailer ||
+    (type === 'album' ? item.appleMusic || appleMusicSearch(item.title, item.subtitle) : null) ||
     `https://www.youtube.com/results?search_query=${encodeURIComponent(
       `${item.title} ${item.year} ${type === 'album' ? item.subtitle : type === 'jeu' ? 'trailer' : 'bande annonce'}`
     )}`
@@ -82,7 +84,7 @@ export default function Item() {
               </button>
             ) : (
               <a className="glass-btn" href={trailer} target="_blank" rel="noreferrer">
-                {type === 'album' ? 'Écouter' : 'Bande-annonce'}
+                {type === 'album' ? 'Apple Music' : 'Bande-annonce'}
               </a>
             )}
             {poster && <button className="glass-btn" onClick={() => setShowPoster(true)}>{type === 'album' ? 'Pochette' : 'Affiche'}</button>}
