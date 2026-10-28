@@ -202,22 +202,14 @@ button.wide { width: 100%; }
 .hero.playing .hero-image, .hero.playing .hero-ambient { opacity: 0; }
 .hero.playing { background: linear-gradient(to bottom, #000 0%, #000 70%, var(--bg) 100%); }
 .trailer-glow { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 16 / 9; z-index: 0; pointer-events: none; }
-.trailer-glow img, .trailer-glow video { width: 100%; height: 100%; object-fit: cover; filter: blur(42px) saturate(1.8) brightness(1.1); transform: scale(1.25); opacity: .85; }
+.trailer-glow video { width: 100%; height: 100%; object-fit: cover; filter: blur(42px) saturate(1.8) brightness(1.1); transform: scale(1.25); opacity: .85; }
 .trailer-frame { position: relative; z-index: 1; }
 .trailer-tools { position: relative; z-index: 1; }
-.trailer.full .trailer-glow { top: 50%; left: 50%; right: auto; width: min(100%, calc((100vh - 130px) * 16 / 9)); transform: translate(-50%, -50%); }
 .trailer { position: absolute; z-index: 4; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 64px); max-width: 900px; margin: 0 auto; }
 .trailer-frame { width: 100%; aspect-ratio: 16 / 9; background: #000; }
 .trailer-frame iframe, .trailer-frame video { width: 100%; height: 100%; border: 0; display: block; }
 .trailer-tools { display: flex; justify-content: flex-end; gap: .5rem; padding: .6rem max(16px, env(safe-area-inset-right, 0px)) 0; }
 .glass-btn.small { min-height: 36px; padding: 0 .9rem; font-size: .85rem; }
-.trailer.full {
-  position: fixed; inset: 0; z-index: 100; max-width: none; background: #000;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-}
-.trailer.full .trailer-frame { width: min(100%, calc((100vh - 130px) * 16 / 9)); box-shadow: none; }
-.trailer.full .trailer-tools { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 0; padding-top: 0; }
 
 /* Fiche d'une œuvre : grande image en haut qui se fond dans la page (maquette Figma) */
 .item { position: relative; margin: -1.5rem calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; overflow-x: clip; background: var(--bg); padding-bottom: 3rem; }
