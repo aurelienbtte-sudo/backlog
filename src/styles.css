@@ -49,12 +49,15 @@ button:hover { background: #3a4553; }
 button.primary { background: var(--primary); color: #fff; font-weight: 600; }
 button.primary:hover { filter: brightness(1.1); }
 button.danger { background: transparent; border-color: var(--heart); color: var(--heart); }
+button.armed { background: var(--heart); border-color: var(--heart); color: #fff; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--serie); outline-offset: 2px; }
 button.wide { width: 100%; }
 .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
 .icon-btn { background: none; color: var(--muted); padding: .25rem .5rem; }
 
 /* En-tête */
-.header { background: var(--bg-2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+.header { background: var(--bg-2); border-bottom: 1px solid var(--border); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; }
+body::before { content: ''; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg-2); }
 .header-inner { max-width: 1100px; margin: 0 auto; padding: .7rem 16px; display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
 .logo { font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: .5rem; }
 .dots { display: inline-flex; gap: 3px; }

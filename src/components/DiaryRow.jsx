@@ -3,6 +3,7 @@ import Cover from './Cover.jsx'
 import { Stars } from './Stars.jsx'
 import { itemPath } from './MediaCard.jsx'
 import { TYPES } from '../types.js'
+import ConfirmButton from './ConfirmButton.jsx'
 
 const fmt = (d) => new Date(d + 'T12:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -25,7 +26,7 @@ export default function DiaryRow({ log, onDelete }) {
         {log.review && <p className="review">{log.review}</p>}
       </div>
       {onDelete && (
-        <button className="icon-btn" onClick={() => confirm('Supprimer cette entrée du journal ?') && onDelete(log.id)} aria-label="Supprimer">✕</button>
+        <ConfirmButton className="icon-btn" onConfirm={() => onDelete(log.id)} confirmLabel="Supprimer ?" aria-label="Supprimer cette entrée">✕</ConfirmButton>
       )}
     </div>
   )

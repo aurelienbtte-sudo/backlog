@@ -42,7 +42,7 @@ export default function Profile() {
       <section className="ratings">
         <div className="section-head">
           <h2>Notes</h2>
-          <span className="muted">{rated.length} notés · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</span>
+          <span className="muted">{rated.length} noté{rated.length > 1 ? "s" : ""} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</span>
         </div>
         <div className="histogram" aria-label="Répartition des notes">
           {histogram.map((n, i) => (

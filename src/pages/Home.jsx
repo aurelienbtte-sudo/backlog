@@ -5,7 +5,7 @@ import { useStore, sortedDiary } from '../store.js'
 import { Grid } from '../components/MediaCard.jsx'
 import TypeTabs from '../components/TypeTabs.jsx'
 import DiaryRow from '../components/DiaryRow.jsx'
-import { TYPES } from '../types.js'
+import { TYPES, ARTIFACT } from '../types.js'
 
 export default function Home() {
   const diary = useStore((s) => s.diary)
@@ -48,13 +48,16 @@ export default function Home() {
           <h2>{live ? 'Populaire en ce moment' : 'Sélection'}</h2>
         </div>
         <TypeTabs value={type} onChange={setType} />
-        {!isLive(type) && (
+        {ARTIFACT && (
+          <p className="notice">Version d'essai : choisis parmi {items.length} {TYPES[type].label.toLowerCase()} de démonstration, ou utilise la recherche.</p>
+        )}
+        {!ARTIFACT && !isLive(type) && (
           <p className="notice">
             Mode démo pour les {TYPES[type].label.toLowerCase()}. <Link to="/reglages">Ajoute une clé API gratuite</Link> pour accéder au catalogue complet.
           </p>
         )}
-        {type === 'album' && <p className="muted small">Pour la musique, utilise la recherche pour trouver n'importe quel album.</p>}
-        {error ? <p className="error">{error}</p> : <Grid items={items.slice(0, 18)} />}
+        {!ARTIFACT && type === 'album' && <p className="muted small">Pour la musique, utilise la recherche pour trouver n'importe quel album.</p>}
+        {error ? <p className="error">{error}</p> : <Grid items={ARTIFACT ? items : items.slice(0, 18)} />}
       </section>
     </>
   )

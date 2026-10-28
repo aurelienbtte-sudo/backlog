@@ -1,14 +1,18 @@
-import React from 'react'
+import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
+import { HashRouter, MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './styles.css'
+import { ARTIFACT } from './types.js'
+
+// Dans un artefact, la navigation reste en mémoire (l'adresse de la page ne peut pas changer)
+const Router = ARTIFACT ? MemoryRouter : HashRouter
 
 // HashRouter : les URL du type /#/film/123 marchent sur n'importe quel hébergeur statique
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <HashRouter>
+  <StrictMode>
+    <Router>
       <App />
-    </HashRouter>
-  </React.StrictMode>
+    </Router>
+  </StrictMode>
 )

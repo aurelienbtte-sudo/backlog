@@ -7,6 +7,7 @@ import Diary from './pages/Diary.jsx'
 import Watchlist from './pages/Watchlist.jsx'
 import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
+import { ARTIFACT } from './types.js'
 
 export default function App() {
   return (
@@ -25,7 +26,9 @@ export default function App() {
         </Routes>
       </main>
       <footer className="footer">
-        Données : TMDB · RAWG · MusicBrainz. Ce produit utilise l'API TMDB sans être approuvé ni certifié par TMDB.
+        {ARTIFACT
+          ? 'Version d\'essai avec un catalogue de démonstration. Tes notes restent dans ce navigateur.'
+          : 'Données : TMDB · RAWG · MusicBrainz. Ce produit utilise l\'API TMDB sans être approuvé ni certifié par TMDB.'}
       </footer>
     </>
   )

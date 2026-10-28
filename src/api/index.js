@@ -4,9 +4,11 @@ import * as rawg from './rawg.js'
 import * as mb from './musicbrainz.js'
 import { DEMO, searchDemo } from './demo.js'
 import { getKey } from './keys.js'
+import { ARTIFACT } from '../types.js'
 
 // La musique (MusicBrainz) n'a pas besoin de clé
 export function isLive(type) {
+  if (ARTIFACT) return false
   if (type === 'album') return true
   return Boolean(getKey(type === 'jeu' ? 'rawg' : 'tmdb'))
 }

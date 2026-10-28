@@ -41,6 +41,9 @@ export const getState = () => state
 // On ne garde que l'essentiel d'une œuvre pour l'afficher sans rappeler l'API
 const slim = ({ id, type, sourceId, title, year, cover, subtitle }) => ({ id, type, sourceId, title, year, cover, subtitle })
 
+// crypto.randomUUID n'existe que sur les pages en HTTPS
+const newId = () => crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+
 const blankEntry = { rating: 0, liked: false, wishlist: false, done: false }
 
 export function updateEntry(item, patch) {
@@ -54,7 +57,7 @@ export function updateEntry(item, patch) {
 }
 
 export function addLog(item, { date, rating, review, liked, again }) {
-  const log = { id: crypto.randomUUID(), itemId: item.id, item: slim(item), date, rating, review, liked, again, createdAt: Date.now() }
+  const log = { id: newId(), itemId: item.id, item: slim(item), date, rating, review, liked, again, createdAt: Date.now() }
   set((s) => ({ ...s, diary: [log, ...s.diary] }))
   const patch = { done: true, wishlist: false, liked: liked || getState().entries[item.id]?.liked || false }
   if (rating) patch.rating = rating

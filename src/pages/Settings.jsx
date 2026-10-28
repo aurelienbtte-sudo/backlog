@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import { useStore, setSetting, exportData, importData, resetData } from '../store.js'
+import ConfirmButton from '../components/ConfirmButton.jsx'
+import { ARTIFACT } from '../types.js'
 
 export default function Settings() {
   const settings = useStore((s) => s.settings)
@@ -20,6 +22,15 @@ export default function Settings() {
     a.download = `backlog-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(a.href)
+  }
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(exportData())
+      setMsg('Données copiées dans le presse-papiers ✔')
+    } catch {
+      setMsg('Copie impossible ici. Utilise le bouton Exporter.')
+    }
   }
 
   const upload = async (e) => {
@@ -44,6 +55,7 @@ export default function Settings() {
         {field('bio', 'Bio')}
       </section>
 
+      {!ARTIFACT && (
       <section className="card-box">
         <h2>Clés API (gratuites)</h2>
         <p className="muted small">
@@ -55,15 +67,17 @@ export default function Settings() {
         {field('rawgKey', 'RAWG — jeux vidéo', { placeholder: 'Clé API RAWG', autoComplete: 'off' })}
         <p className="small"><a href="https://rawg.io/apidocs" target="_blank" rel="noreferrer">Obtenir une clé RAWG →</a></p>
       </section>
+      )}
 
       <section className="card-box">
         <h2>Sauvegarde</h2>
         <p className="muted small">Tes données sont stockées dans ce navigateur. Exporte-les régulièrement pour ne rien perdre ou les transférer sur un autre appareil.</p>
         <div className="row">
-          <button onClick={download}>⬇ Exporter</button>
+          {!ARTIFACT && <button onClick={download}>⬇ Exporter</button>}
+          <button onClick={copy}>⧉ Copier</button>
           <button onClick={() => fileRef.current.click()}>⬆ Importer</button>
           <input ref={fileRef} type="file" accept="application/json" hidden onChange={upload} />
-          <button className="danger" onClick={() => confirm('Effacer tout ton journal et tes notes ?') && resetData()}>Tout effacer</button>
+          <ConfirmButton className="danger" onConfirm={() => { resetData(); setMsg('Données effacées.') }} confirmLabel="Oui, tout effacer">Tout effacer</ConfirmButton>
         </div>
         {msg && <p className="small">{msg}</p>}
       </section>

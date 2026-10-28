@@ -8,4 +8,7 @@ export const TYPES = {
 
 export const TYPE_KEYS = Object.keys(TYPES)
 
+// Version d'essai publiée en artefact : pas d'accès aux APIs externes
+export const ARTIFACT = import.meta.env.MODE === 'artifact'
+
 export const todayISO = () => new Date().toISOString().slice(0, 10)
