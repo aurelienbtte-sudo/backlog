@@ -53,3 +53,6 @@ create policy "own entries" on public.entries for all
 drop policy if exists "own logs" on public.logs;
 create policy "own logs" on public.logs for all
   using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+
+-- Accès aux tables pour les utilisateurs connectés (la sécurité ci-dessus limite chacun à ses données)
+grant select, insert, update, delete on public.profiles, public.entries, public.logs to authenticated;
