@@ -225,12 +225,6 @@ button.wide { width: 100%; }
 }
 .hero-image.square { background-position: center; }
 .hero-image.placeholder { background: linear-gradient(160deg, hsl(var(--hue) 45% 35%), hsl(calc(var(--hue) + 40) 50% 15%)); }
-/* jeux : extrait vidéo en fond, avec le même fondu vers le bas que l'image */
-.hero-video, .hero-video-ambient { position: absolute; left: 0; right: 0; top: 0; width: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s; pointer-events: none; }
-.hero-video { height: 100%; -webkit-mask-image: linear-gradient(to bottom, #000 45%, rgba(0, 0, 0, .55) 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 45%, rgba(0, 0, 0, .55) 72%, transparent 100%); }
-.hero-video.on { opacity: 1; }
-.hero-video-ambient { height: 150%; filter: blur(60px) saturate(1.4); transform: scale(1.2); -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); }
-.hero-video-ambient.on { opacity: .45; }
 /* copie très floutée de l'image : ses couleurs débordent sur le haut de la page */
 .hero-ambient {
   position: absolute; left: 0; right: 0; top: 0; height: 150%;
