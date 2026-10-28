@@ -310,7 +310,12 @@ button.wide { width: 100%; }
 /* Profil */
 .profile-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
 .profile-head h1 { margin: 0; }
-.avatar { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--film), var(--jeu)); }
+.avatar { --size: 72px; position: relative; flex: none; width: var(--size); height: var(--size); padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; font-size: calc(var(--size) * .42); font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--film), var(--jeu)); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.avatar-badge { position: absolute; right: -2px; bottom: -2px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-3); color: var(--text); border: 2px solid var(--bg); }
+button.avatar:hover { background: linear-gradient(135deg, var(--film), var(--jeu)); filter: brightness(1.08); }
+.avatar-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.avatar-row .row { flex-direction: column; align-items: flex-start; gap: .1rem; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 .stat { background: var(--bg-2); border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 1rem; display: flex; flex-direction: column; }
 .stat strong { font-size: 2rem; line-height: 1; }

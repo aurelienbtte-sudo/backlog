@@ -9,6 +9,9 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+-- Photo de profil (ajoutée après coup : sans effet si la colonne existe déjà)
+alter table public.profiles add column if not exists avatar text not null default '';
+
 -- Une ligne par œuvre : note, coup de cœur, "à découvrir", vu/joué/écouté
 create table if not exists public.entries (
   user_id uuid not null default auth.uid() references auth.users on delete cascade,

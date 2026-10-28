@@ -102,9 +102,22 @@ async function upsertMany(table, rows) {
   }
 }
 
+// Vrai tant que la base n'a pas la colonne « avatar » (script SQL pas encore relancé)
+let avatarColumnMissing = false
+const isMissingAvatarColumn = (error) => /avatar/i.test(error?.message || '')
+
 async function pushProfile(userId) {
-  const { name = '', bio = '' } = getState().settings
-  check(await supabase.from('profiles').upsert({ id: userId, name, bio, updated_at: new Date().toISOString() }))
+  const { name = '', bio = '', avatar = '' } = getState().settings
+  const row = { id: userId, name, bio, updated_at: new Date().toISOString() }
+  if (!avatarColumnMissing) {
+    const res = await supabase.from('profiles').upsert({ ...row, avatar })
+    if (!res.error) return
+    if (!isMissingAvatarColumn(res.error)) throw res.error
+    avatarColumnMissing = true
+  }
+  check(await supabase.from('profiles').upsert(row))
+  // la photo reste sur cet appareil ; on prévient pour qu'elle soit aussi sauvegardée en ligne
+  if (avatar) throw new Error('La photo de profil reste sur cet appareil : relance le script SQL de Supabase pour la sauvegarder en ligne.')
 }
 
 // Les envois passent par une file d'attente : ils arrivent au serveur dans l'ordre des clics
@@ -160,9 +173,11 @@ async function pull() {
 
   // Profil : celui en ligne s'il existe, sinon on envoie celui de l'appareil
   const profile = profileRes.data
-  if (profile && (profile.name || profile.bio)) {
+  if (profile && (profile.name || profile.bio || profile.avatar)) {
     setSetting('name', profile.name)
     setSetting('bio', profile.bio)
+    if (profile.avatar !== undefined) setSetting('avatar', profile.avatar)
+    else if (getState().settings.avatar) await pushProfile(userId)
   } else {
     await pushProfile(userId)
   }

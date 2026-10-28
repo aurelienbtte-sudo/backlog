@@ -3,6 +3,7 @@ import { useStore, setSetting, exportData, importData, resetData } from '../stor
 import ConfirmButton from '../components/ConfirmButton.jsx'
 import { ARTIFACT } from '../types.js'
 import Account from '../components/Account.jsx'
+import Avatar from '../components/Avatar.jsx'
 import { SYNC_ENABLED } from '../sync.js'
 
 export default function Settings() {
@@ -57,6 +58,13 @@ export default function Settings() {
 
       <section className="card-box">
         <h2>Profil</h2>
+        <div className="avatar-row">
+          <Avatar editable size={64} />
+          <div className="row">
+            <span className="muted small">Touche la photo pour la changer.</span>
+            {settings.avatar && <button type="button" className="link-btn" onClick={() => setSetting('avatar', '')}>Retirer la photo</button>}
+          </div>
+        </div>
         {field('name', 'Pseudo')}
         {field('bio', 'Bio')}
       </section>

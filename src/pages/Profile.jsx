@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, sortedDiary } from '../store.js'
 import DiaryRow from '../components/DiaryRow.jsx'
+import Avatar from '../components/Avatar.jsx'
 import { SYNC_ENABLED, useSync } from '../sync.js'
 import { Grid } from '../components/MediaCard.jsx'
 import TypeTabs from '../components/TypeTabs.jsx'
@@ -32,7 +33,7 @@ export default function Profile() {
   return (
     <>
       <div className="profile-head">
-        <div className="avatar">{(settings.name || '?')[0].toUpperCase()}</div>
+        <Avatar editable />
         <div>
           <h1>{settings.name || 'Mon profil'}</h1>
           {settings.bio && <p className="muted">{settings.bio}</p>}
