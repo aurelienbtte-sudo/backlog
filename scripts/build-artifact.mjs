@@ -5,7 +5,7 @@ const js = readFileSync('dist-artifact/app.js', 'utf8').replace(/<\/script/gi, '
 const css = readFileSync('dist-artifact/app.css', 'utf8')
 const CDN = 'https://cdnjs.cloudflare.com/ajax/libs'
 
-const html = `<title>Backlog</title>
+const html = `<title>Pop up</title>
 <meta name="description" content="Note et garde une trace de tes films, séries, jeux vidéo et albums.">
 <style>${css}</style>
 <div id="root"></div>

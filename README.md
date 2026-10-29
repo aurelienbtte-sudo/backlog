@@ -1,4 +1,4 @@
-# Backlog 🎬📺🎮🎵
+# Pop up 🎬📺🎮🎵
 
 Un « Letterboxd » pour **les films, les séries, les jeux vidéo et la musique** : note sur 5 étoiles (demi-étoiles comprises), écris des critiques, tiens un journal daté, garde une liste « à découvrir » et consulte tes statistiques.
 
