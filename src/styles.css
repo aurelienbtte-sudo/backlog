@@ -490,3 +490,23 @@ button.top3-pick:disabled { opacity: .45; }
 .profile .ratings-filter svg { right: .75rem; }
 .profile .ratings > p, .profile .ratings .histogram-axis { margin: 0; }
 .profile .podium { margin: 0; }
+
+/* Coche rapide « vu » sur chaque affiche */
+.card-wrap { position: relative; min-width: 0; }
+.quick-done {
+  position: absolute; top: 6px; right: 6px; z-index: 2;
+  width: 30px; height: 30px; padding: 0; border-radius: 50%;
+  display: grid; place-items: center;
+  color: #fff; background: rgba(20, 10, 6, .45);
+  border: 1.5px solid rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+  transition: transform .15s, background .15s;
+}
+.quick-done svg { opacity: .55; }
+.quick-done:hover { background: rgba(20, 10, 6, .6); }
+.quick-done.on { background: var(--ink); color: var(--paper); border-color: var(--paper); }
+.quick-done.on svg { opacity: 1; }
+.quick-done:active { transform: scale(.88); }
+/* zone tactile plus grande que le rond visible */
+.quick-done::after { content: ''; position: absolute; inset: -8px; }
