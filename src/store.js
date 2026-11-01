@@ -56,7 +56,8 @@ const blankEntry = { rating: 0, liked: false, wishlist: false, done: false }
 
 export function updateEntry(item, patch) {
   set((s) => {
-    const prev = s.entries[item.id] || blankEntry
+    // addedAt : moment où l'œuvre arrive dans ta collection (pour le tri « Ajoutés récemment »)
+    const prev = s.entries[item.id] || { ...blankEntry, addedAt: Date.now() }
     return {
       ...s,
       entries: { ...s.entries, [item.id]: { ...prev, updatedAt: Date.now(), ...patch, item: slim(item) } },

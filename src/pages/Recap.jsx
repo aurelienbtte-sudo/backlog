@@ -120,6 +120,7 @@ function ViewCounts({ entry, diary, views, year }) {
 const byTitle = (a, b) => a.entry.item.title.localeCompare(b.entry.item.title, 'fr')
 const SORTS = {
   heures: { label: 'Temps total', title: "Les films qui t'ont pris le plus de temps", compare: (a, b) => b.minutes - a.minutes || byTitle(a, b) },
+  ajout: { label: 'Ajoutés récemment', title: 'Derniers films ajoutés', compare: (a, b) => b.addedAt - a.addedAt || byTitle(a, b) },
   recent: { label: 'Vus récemment', title: 'Derniers films vus', compare: (a, b) => b.lastSeen.localeCompare(a.lastSeen) || byTitle(a, b) },
   fois: { label: 'Nombre de visionnages', title: 'Les films les plus revus', compare: (a, b) => b.views.total - a.views.total || b.minutes - a.minutes },
   annee: { label: `Visionnages en ${new Date().getFullYear()}`, title: `Les plus vus en ${new Date().getFullYear()}`, compare: (a, b) => b.views.thisYear - a.views.thisYear || b.lastSeen.localeCompare(a.lastSeen) },
@@ -179,7 +180,9 @@ export default function Recap() {
         const logs = diary.filter((l) => l.itemId === d.entry.item.id)
         // date du dernier visionnage connu (journal), sinon le moment où le film a été coché
         const lastSeen = logs.length ? logs.map((l) => l.date).sort().at(-1) : new Date(d.entry.updatedAt).toISOString().slice(0, 10)
-        return { ...d, minutes: d.views.total * d.entry.item.runtime, lastSeen }
+        // date d'ajout : enregistrée pour les œuvres récentes ; pour les plus anciennes, première trace connue
+        const addedAt = d.entry.addedAt || Math.min(d.entry.updatedAt || Infinity, ...logs.map((l) => l.createdAt || Infinity))
+        return { ...d, minutes: d.views.total * d.entry.item.runtime, lastSeen, addedAt }
       })
       .sort(SORTS[sort].compare)
     const missing = done.length - films.length
