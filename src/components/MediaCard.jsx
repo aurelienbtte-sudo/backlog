@@ -6,7 +6,8 @@ import { TYPES } from '../types.js'
 
 export const itemPath = (item) => `/${item.type}/${encodeURIComponent(item.sourceId)}`
 
-export default function MediaCard({ item, showMeta = true }) {
+// quickDone : affiche la coche « vu » sur l'affiche (utilisée seulement dans la recherche)
+export default function MediaCard({ item, showMeta = true, quickDone = false }) {
   const entry = useStore((s) => s.entries[item.id])
   const done = Boolean(entry?.done)
   const label = TYPES[item.type].done // Vu, Vue, Joué, Écouté
@@ -31,6 +32,7 @@ export default function MediaCard({ item, showMeta = true }) {
         </div>
       )}
     </Link>
+      {quickDone && (
       <button
         type="button"
         className={`quick-done ${done ? 'on' : ''}`}
@@ -43,16 +45,17 @@ export default function MediaCard({ item, showMeta = true }) {
           <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
+      )}
     </div>
   )
 }
 
-export function Grid({ items, empty = 'Rien ici pour le moment.' }) {
+export function Grid({ items, empty = 'Rien ici pour le moment.', quickDone = false }) {
   if (!items.length) return <p className="muted">{empty}</p>
   return (
     <div className="grid">
       {items.map((item) => (
-        <MediaCard key={item.id} item={item} />
+        <MediaCard key={item.id} item={item} quickDone={quickDone} />
       ))}
     </div>
   )
