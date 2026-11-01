@@ -267,7 +267,12 @@ button.wide { width: 100%; }
 .hero-image, .hero-ambient { transition: opacity .5s; }
 /* pendant la vidéo, l'affiche s'efface pour un fond noir, éclairé par le halo de la vidéo */
 .hero.playing .hero-image, .hero.playing .hero-ambient { opacity: 0; }
-.hero.playing { background: linear-gradient(to bottom, #000 0%, #000 70%, var(--bg) 100%); }
+.hero.playing { background: linear-gradient(to bottom, #000 0%, #000 82%, var(--bg) 100%); }
+/* pendant la vidéo, le fond est noir : titre et boutons passent en clair, quel que soit le mode */
+.hero.playing {
+  --hero-text: #fff; --hero-glow: rgba(0, 0, 0, .6);
+  --hero-btn-bg: rgba(255, 255, 255, .16); --hero-btn-text: #fff; --hero-btn-border: rgba(255, 255, 255, .3);
+}
 .trailer-frame { position: relative; z-index: 1; }
 .trailer-tools { position: relative; z-index: 1; }
 .trailer { position: absolute; z-index: 4; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 64px); max-width: 900px; margin: 0 auto; }
