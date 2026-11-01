@@ -115,7 +115,9 @@ export function useImagePalette(src, fallbackHue) {
         if (fallbackHue !== undefined) color = { h: fallbackHue, s: 45 }
         apply()
       }
-      img.src = src
+      // adresse distincte de celle de l'affiche affichée : sinon Safari ressert sa copie en mémoire,
+      // chargée sans autorisation de lecture, et les couleurs ne peuvent pas être lues
+      img.src = src + (src.includes('?') ? '&' : '?') + 'palette=1'
     } else {
       color = { h: fallbackHue, s: 45 }
       apply()
