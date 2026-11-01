@@ -88,8 +88,16 @@ export async function details(type, id) {
     // versions proposées par le bouton VO / VF du lecteur (seulement si elles diffèrent)
     // pour un film français, la VO est la version française : pas de bouton
     const voVideo = vo === 'fr' ? sorted.find((v) => v.iso_639_1 === 'fr') : sorted.find((v) => v.iso_639_1 !== 'fr')
-    const vfVideo = sorted.find((v) => v.iso_639_1 === 'fr')
-    if (voVideo && vfVideo && voVideo.key !== vfVideo.key) item.trailerKeys = { vo: voVideo.key, vf: vfVideo.key }
+    // Les vidéos « fr » de TMDB mélangent VF (doublée) et VOSTFR (sous-titrée) : on repère la VOSTFR
+    // à son titre et on privilégie la vraie VF ; à défaut, la VOSTFR est proposée sous son nom
+    const isVost = (v) => /vost|sous[- ]?titr/i.test(v.name || '')
+    const isVf = (v) => /\bvf\b|version fran|doubl/i.test(v.name || '')
+    const frVideos = sorted.filter((v) => v.iso_639_1 === 'fr')
+    const vfVideo =
+      frVideos.find((v) => isVf(v) && !isVost(v)) || frVideos.find((v) => !isVost(v)) || frVideos.find(isVost)
+    if (voVideo && vfVideo && voVideo.key !== vfVideo.key) {
+      item.trailerKeys = { vo: voVideo.key, vf: vfVideo.key, vfLabel: isVost(vfVideo) ? 'VOSTFR' : 'VF' }
+    }
   }
   item.cast = (r.credits?.cast || []).slice(0, 10).map((c) => c.name)
   item.facts =

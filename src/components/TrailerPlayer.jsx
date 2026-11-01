@@ -45,8 +45,8 @@ export default function TrailerPlayer({ item, onClose }) {
       </div>
       <div className="trailer-tools">
         {keys && (
-          <button className="glass-btn small" onClick={toggle} aria-label={lang === 'vo' ? 'Voir la bande-annonce en VF' : 'Voir la bande-annonce en VO'}>
-            {lang === 'vo' ? 'Passer en VF' : 'Passer en VO'}
+          <button className="glass-btn small" onClick={toggle} aria-label={lang === 'vo' ? `Voir la bande-annonce en ${keys.vfLabel}` : 'Voir la bande-annonce en VO'}>
+            {lang === 'vo' ? `Passer en ${keys.vfLabel}` : 'Passer en VO'}
           </button>
         )}
         <button className="glass-btn small" onClick={onClose}>
