@@ -59,6 +59,34 @@ function dominantColor(img) {
   return { h, s: Math.min(s, 75) }
 }
 
+// Les sites d'affiches (TMDB…) n'autorisent pas la lecture des couleurs de leurs images.
+// On demande donc une miniature au service d'images gratuit wsrv.nl, qui l'autorise,
+// puis on essaie l'image d'origine en dernier recours.
+function readableSources(src) {
+  const bare = src.replace(/^https?:\/\//, '')
+  return [`https://wsrv.nl/?url=${encodeURIComponent(bare)}&w=60&output=jpg`, src]
+}
+
+function loadReadable(sources) {
+  return new Promise((resolve) => {
+    const tryNext = (i) => {
+      if (i >= sources.length) return resolve(null)
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        try {
+          resolve(dominantColor(img))
+        } catch {
+          tryNext(i + 1) // image chargée mais illisible
+        }
+      }
+      img.onerror = () => tryNext(i + 1)
+      img.src = sources[i]
+    }
+    tryNext(0)
+  })
+}
+
 const hsl = (h, s, l, a = 1) => `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${a})`
 
 function paletteFor({ h, s }, dark) {
@@ -115,18 +143,11 @@ export function useImagePalette(src, fallbackHue) {
     }
 
     if (src) {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        try {
-          color = dominantColor(img)
-        } catch {
-          color = null // image illisible : on garde la DA plutôt qu'une couleur au hasard
-        }
+      // image illisible partout : on garde la DA plutôt qu'une couleur au hasard
+      loadReadable(readableSources(src)).then((c) => {
+        color = c
         apply()
-      }
-      img.onerror = () => {} // image introuvable : on garde la DA
-      img.src = src
+      })
     } else {
       color = { h: fallbackHue, s: 45 }
       apply()
