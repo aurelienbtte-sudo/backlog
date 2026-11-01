@@ -44,7 +44,7 @@ export default function Profile() {
   return (
     <>
       <div className="profile-head">
-        <Avatar editable />
+        <Avatar editable size={128} />
         <div>
           <h1>{settings.name || 'Mon profil'}</h1>
           {settings.bio && <p className="muted">{settings.bio}</p>}
@@ -90,6 +90,23 @@ export default function Profile() {
         </div>
       </div>
 
+      <TypeTabs value={type} onChange={setType} withAll />
+
+      <section className="ratings">
+        <div className="section-head">
+          <h2>Notes</h2>
+          <span className="muted">{rated.length} noté{rated.length > 1 ? "s" : ""} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</span>
+        </div>
+        <div className="histogram" aria-label="Répartition des notes">
+          {histogram.map((n, i) => (
+            <div key={i} className="bar" title={`${(i + 1) / 2} ★ : ${n}`}>
+              <div style={{ height: `${(n / max) * 100}%` }} />
+            </div>
+          ))}
+        </div>
+        <div className="histogram-axis"><span>½</span><span>★★★★★</span></div>
+      </section>
+
       <div className="shortcuts">
         <Link to="/journal" className="shortcut" style={{ '--accent': 'var(--film)' }}>
           <strong>{diary.length}</strong>
@@ -111,23 +128,6 @@ export default function Profile() {
         ) : (
           <p className="muted">Rien pour l'instant. Choisis Jeux, Cinéma ou Musique en bas, ouvre une œuvre et ajoute-la à ton journal.</p>
         )}
-      </section>
-
-      <TypeTabs value={type} onChange={setType} withAll />
-
-      <section className="ratings">
-        <div className="section-head">
-          <h2>Notes</h2>
-          <span className="muted">{rated.length} noté{rated.length > 1 ? "s" : ""} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</span>
-        </div>
-        <div className="histogram" aria-label="Répartition des notes">
-          {histogram.map((n, i) => (
-            <div key={i} className="bar" title={`${(i + 1) / 2} ★ : ${n}`}>
-              <div style={{ height: `${(n / max) * 100}%` }} />
-            </div>
-          ))}
-        </div>
-        <div className="histogram-axis"><span>½</span><span>★★★★★</span></div>
       </section>
 
       <section>
