@@ -591,3 +591,9 @@ button.top3-pick:disabled { opacity: .45; }
 @media (min-width: 1100px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
+
+/* En-tête de la liste avec le bouton de tri */
+.recap-sort-head { align-items: center; padding-bottom: .5rem; flex-wrap: wrap; }
+.recap-sort-head h2 { margin: 0; flex: 1; min-width: 12rem; }
+.recap-sort-head .pill-select select { height: 30px; font-size: .78rem; padding: 0 1.45rem 0 .7rem; }
+.recap-sort-head .pill-select svg { right: .5rem; }

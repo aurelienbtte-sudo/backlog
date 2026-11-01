@@ -116,6 +116,18 @@ function ViewCounts({ entry, diary, views, year }) {
   )
 }
 
+// Tris de la liste des films (page des heures)
+const byTitle = (a, b) => a.entry.item.title.localeCompare(b.entry.item.title, 'fr')
+const SORTS = {
+  heures: { label: 'Temps total', title: "Les films qui t'ont pris le plus de temps", compare: (a, b) => b.minutes - a.minutes || byTitle(a, b) },
+  recent: { label: 'Vus récemment', title: 'Derniers films vus', compare: (a, b) => b.lastSeen.localeCompare(a.lastSeen) || byTitle(a, b) },
+  fois: { label: 'Nombre de visionnages', title: 'Les films les plus revus', compare: (a, b) => b.views.total - a.views.total || b.minutes - a.minutes },
+  annee: { label: `Visionnages en ${new Date().getFullYear()}`, title: `Les plus vus en ${new Date().getFullYear()}`, compare: (a, b) => b.views.thisYear - a.views.thisYear || b.lastSeen.localeCompare(a.lastSeen) },
+  duree: { label: 'Durée du film', title: 'Les films les plus longs', compare: (a, b) => b.entry.item.runtime - a.entry.item.runtime || byTitle(a, b) },
+  note: { label: 'Ta note', title: 'Tes films les mieux notés', compare: (a, b) => (b.entry.rating || 0) - (a.entry.rating || 0) || b.minutes - a.minutes },
+  titre: { label: 'Titre (A → Z)', title: 'Tous tes films', compare: byTitle },
+}
+
 const formatHours = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}` : `${min} min`)
 
 // Récapitulatif d'une catégorie du profil (séries, jeux, musique, films) ou des heures de films
@@ -125,6 +137,21 @@ export default function Recap() {
   const { entries, diary } = useStore()
   const year = String(new Date().getFullYear())
   useFilmRuntimes()
+  const [sort, setSortState] = useState(() => {
+    try {
+      return SORTS[localStorage.getItem('popup:tri-heures')] ? localStorage.getItem('popup:tri-heures') : 'heures'
+    } catch {
+      return 'heures'
+    }
+  })
+  const setSort = (v) => {
+    setSortState(v)
+    try {
+      localStorage.setItem('popup:tri-heures', v)
+    } catch {
+      // stockage indisponible : le tri n'est pas mémorisé
+    }
+  }
 
   const isHours = type === 'heures'
   if (!isHours && !TYPES[type]) return <p>Catégorie inconnue.</p>
@@ -148,8 +175,13 @@ export default function Recap() {
     const hours = filmHours(entries, diary, year)
     const films = done
       .filter((d) => d.entry.item.runtime)
-      .map((d) => ({ ...d, minutes: d.views.total * d.entry.item.runtime }))
-      .sort((a, b) => b.minutes - a.minutes)
+      .map((d) => {
+        const logs = diary.filter((l) => l.itemId === d.entry.item.id)
+        // date du dernier visionnage connu (journal), sinon le moment où le film a été coché
+        const lastSeen = logs.length ? logs.map((l) => l.date).sort().at(-1) : new Date(d.entry.updatedAt).toISOString().slice(0, 10)
+        return { ...d, minutes: d.views.total * d.entry.item.runtime, lastSeen }
+      })
+      .sort(SORTS[sort].compare)
     const missing = done.length - films.length
     return (
       <>
@@ -161,7 +193,18 @@ export default function Recap() {
           <div className="stat"><strong>{films.length ? Math.round(films.reduce((s, f) => s + f.entry.item.runtime, 0) / films.length) : 0}</strong><span>min par film</span></div>
         </div>
         <section>
-          <div className="section-head"><h2>Les films qui t'ont pris le plus de temps</h2></div>
+          <div className="section-head recap-sort-head">
+            <h2>{SORTS[sort].title}</h2>
+            <label className="pill-select">
+              <span className="sr-only">Trier les films</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                {Object.entries(SORTS).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+              <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </label>
+          </div>
           {films.length === 0 && <p className="muted">Marque un film comme vu pour commencer le compteur.</p>}
           <div className="diary">
             {films.map(({ entry, views, minutes }) => (
