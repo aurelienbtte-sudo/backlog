@@ -599,3 +599,19 @@ button.top3-pick:disabled { opacity: .45; }
 .recap-sort-head .pill-select svg { right: .5rem; }
 
 .stat-days { margin-top: .5rem; font-size: clamp(.78rem, 3.4vw, .95rem); font-weight: 300; opacity: .85; color: var(--ink); }
+
+/* Bouton retour : flottant juste au-dessus de la barre de recherche, à droite (à portée de pouce) */
+.float-back {
+  position: fixed; z-index: 21;
+  /* même bord droit que les barres du bas (largeur max 520 px, centrées) */
+  right: max(12px, calc((100vw - 520px) / 2));
+  bottom: calc(max(6px, calc(env(safe-area-inset-bottom, 0px) - 18px)) + 60px + 5px + 44px + 10px);
+  width: 48px; height: 48px; padding: 0; border-radius: 50%;
+  display: grid; place-items: center; color: var(--bar-text);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--bar-border);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.float-back:hover { background: var(--glass-strong); }
+.float-back:active { transform: scale(.92); }

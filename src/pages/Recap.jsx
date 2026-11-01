@@ -173,7 +173,7 @@ export default function Recap() {
     .sort((a, b) => b.entry.updatedAt - a.entry.updatedAt)
 
   const back = (
-    <button className="recap-back" onClick={() => navigate(-1)} aria-label="Retour">
+    <button className="float-back" onClick={() => navigate(-1)} aria-label="Retour">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
         <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
