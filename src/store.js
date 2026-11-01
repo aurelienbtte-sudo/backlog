@@ -81,7 +81,7 @@ export function removeLog(id) {
 
 export function setSetting(key, value) {
   set((s) => ({ ...s, settings: { ...s.settings, [key]: value } }))
-  if (key === 'name' || key === 'bio' || key === 'avatar') emit({ type: 'profile' })
+  if (['name', 'bio', 'avatar', 'top3'].includes(key)) emit({ type: 'profile' })
 }
 
 export function exportData() {

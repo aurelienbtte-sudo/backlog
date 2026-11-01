@@ -102,22 +102,29 @@ async function upsertMany(table, rows) {
   }
 }
 
-// Vrai tant que la base n'a pas la colonne « avatar » (script SQL pas encore relancé)
-let avatarColumnMissing = false
-const isMissingAvatarColumn = (error) => /avatar/i.test(error?.message || '')
+// Colonnes ajoutées après coup (photo, top 3) : tant que le script SQL n'a pas été relancé,
+// elles manquent dans la base ; on envoie alors le profil sans elles et on prévient
+const OPTIONAL = ['avatar', 'top3']
+const missingColumns = new Set()
+const missingColumnIn = (error) => OPTIONAL.find((c) => new RegExp(`'${c}'|\\b${c}\\b`, 'i').test(error?.message || ''))
 
 async function pushProfile(userId) {
-  const { name = '', bio = '', avatar = '' } = getState().settings
-  const row = { id: userId, name, bio, updated_at: new Date().toISOString() }
-  if (!avatarColumnMissing) {
-    const res = await supabase.from('profiles').upsert({ ...row, avatar })
-    if (!res.error) return
-    if (!isMissingAvatarColumn(res.error)) throw res.error
-    avatarColumnMissing = true
+  const { name = '', bio = '', avatar = '', top3 = [] } = getState().settings
+  const values = { avatar, top3 }
+  for (;;) {
+    const row = { id: userId, name, bio, updated_at: new Date().toISOString() }
+    OPTIONAL.filter((c) => !missingColumns.has(c)).forEach((c) => (row[c] = values[c]))
+    const res = await supabase.from('profiles').upsert(row)
+    if (!res.error) break
+    const col = missingColumnIn(res.error)
+    if (!col || missingColumns.has(col)) throw res.error
+    missingColumns.add(col)
   }
-  check(await supabase.from('profiles').upsert(row))
-  // la photo reste sur cet appareil ; on prévient pour qu'elle soit aussi sauvegardée en ligne
-  if (avatar) throw new Error('La photo de profil reste sur cet appareil : relance le script SQL de Supabase pour la sauvegarder en ligne.')
+  const lost = [...missingColumns].filter((c) => (Array.isArray(values[c]) ? values[c].length : values[c]))
+  if (lost.length) {
+    const what = lost.map((c) => (c === 'avatar' ? 'ta photo de profil' : 'ton top 4')).join(' et ')
+    throw new Error(`Pour sauvegarder ${what} en ligne, relance le script SQL de Supabase.`)
+  }
 }
 
 // Les envois passent par une file d'attente : ils arrivent au serveur dans l'ordre des clics
@@ -173,11 +180,16 @@ async function pull() {
 
   // Profil : celui en ligne s'il existe, sinon on envoie celui de l'appareil
   const profile = profileRes.data
-  if (profile && (profile.name || profile.bio || profile.avatar)) {
+  if (profile && (profile.name || profile.bio || profile.avatar || profile.top3?.length)) {
     setSetting('name', profile.name)
     setSetting('bio', profile.bio)
-    if (profile.avatar !== undefined) setSetting('avatar', profile.avatar)
-    else if (getState().settings.avatar) await pushProfile(userId)
+    let pushBack = false
+    for (const c of OPTIONAL) {
+      const local = getState().settings[c]
+      if (profile[c] !== undefined && profile[c] !== null && (Array.isArray(profile[c]) ? profile[c].length : profile[c])) setSetting(c, profile[c])
+      else if (Array.isArray(local) ? local?.length : local) pushBack = true // pas encore en ligne : on envoie celui de l'appareil
+    }
+    if (pushBack) await pushProfile(userId)
   } else {
     await pushProfile(userId)
   }

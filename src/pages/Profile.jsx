@@ -31,9 +31,10 @@ export default function Profile() {
   const max = Math.max(1, ...histogram)
   const byRating = (a, b) => b.rating - a.rating || b.updatedAt - a.updatedAt
   const liked = all.filter((e) => e.liked).sort(byRating)
-  const podium = (liked.length >= 3 ? liked : [...liked, ...all.filter((e) => !e.liked && e.rating > 0).sort(byRating)])
-    .slice(0, 3)
+  const auto = (liked.length >= 4 ? liked : [...liked, ...all.filter((e) => !e.liked && e.rating > 0).sort(byRating)])
+    .slice(0, 4)
     .map((e) => e.item)
+  const podium = settings.top3?.length ? settings.top3 : auto
 
   const { ready, user } = useSync()
   useFilmRuntimes()
@@ -98,8 +99,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Tes 3 coups de cœur les mieux notés (ou, à défaut, tes 3 meilleures notes) */}
-      {podium.length > 0 && (
+      {/* Top 4 : choisi par l'utilisateur, sinon ses coups de cœur les mieux notés */}
+      <div className="top3-head">
+        <h2 className="ratings-title">Top 4</h2>
+        <Link to="/top3" className="top3-edit">modifier <Chevron /></Link>
+      </div>
+      {podium.length === 0 ? (
+        <p className="muted small">Choisis tes 4 œuvres préférées avec « modifier ».</p>
+      ) : (
         <div className="podium">
           {podium.map((item) => (
             <Link key={item.id} to={itemPath(item)} title={item.title}>

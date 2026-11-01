@@ -444,7 +444,7 @@ a.stat:hover, .stat-wide:has(> a:hover) { border-color: var(--ink); }
 body, .header, .tabbar, .searchbar, .item { transition: background-color .5s, color .5s; }
 
 /* Profil (maquette) : 3 affiches, puis la section Notes avec son filtre */
-.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; margin-bottom: 1.8rem; }
+.podium { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; margin-bottom: 1.8rem; }
 .podium a { display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px var(--shadow); }
 .podium .cover { border-radius: 8px; }
 .ratings { margin-top: 0; }
@@ -456,3 +456,18 @@ body, .header, .tabbar, .searchbar, .item { transition: background-color .5s, co
   font: inherit; font-size: 16px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
 }
 .ratings-filter svg { position: absolute; right: .9rem; pointer-events: none; }
+
+/* Top 3 du profil */
+.top3-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.top3-edit { display: inline-flex; align-items: center; gap: .2rem; color: var(--ink); font-size: 1.05rem; font-weight: 300; }
+.top3-edit:hover { color: var(--ink); text-decoration: underline; }
+.top3-edit .chevron { margin-left: 0; }
+.top3-slot { display: flex; flex-direction: column; gap: .4rem; }
+.top3-slot.empty { aspect-ratio: 2 / 3; border-radius: 8px; border: 2px dashed var(--border); display: grid; place-items: center; color: var(--muted); font-size: 1.6rem; font-weight: 800; }
+.top3-tools { display: flex; justify-content: space-between; gap: .25rem; }
+.top3-tools button { flex: 1; min-width: 0; padding: .25rem 0; font-size: .8rem; border-radius: 999px; background: var(--bg-3); color: var(--ink); font-weight: 700; }
+.top3-tools button:disabled { opacity: .35; }
+.top3-search { width: 100%; height: 44px; margin: .4rem 0 .8rem; border-radius: 999px; padding: 0 1rem; font-size: 16px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); }
+button.top3-pick { background: none; padding: 0; text-align: left; color: inherit; border-radius: 0; }
+button.top3-pick:hover { background: none; }
+button.top3-pick:disabled { opacity: .45; }

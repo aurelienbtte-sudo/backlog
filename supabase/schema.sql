@@ -11,6 +11,8 @@ create table if not exists public.profiles (
 
 -- Photo de profil (ajoutée après coup : sans effet si la colonne existe déjà)
 alter table public.profiles add column if not exists avatar text not null default '';
+-- Top 3 choisi par l'utilisateur
+alter table public.profiles add column if not exists top3 jsonb not null default '[]';
 
 -- Une ligne par œuvre : note, coup de cœur, "à découvrir", vu/joué/écouté
 create table if not exists public.entries (
