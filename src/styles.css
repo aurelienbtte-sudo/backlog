@@ -538,3 +538,21 @@ button.top3-pick:disabled { opacity: .45; }
 }
 .pill-select svg { position: absolute; right: .6rem; pointer-events: none; }
 .watch-date { height: 30px; padding: 0 .75rem; background: linear-gradient(160deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .15)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 4px 14px var(--shadow); }
+
+/* Récap des heures : titre et heures sur une ligne, puis les 3 pilules ensemble sur toute la largeur */
+.recap-row { grid-template-columns: 50px minmax(0, 1fr) auto; grid-template-rows: auto auto; row-gap: .5rem; align-items: start; }
+.recap-row > a:first-child { grid-row: 1 / 3; }
+.recap-row-link { padding-top: .1rem; }
+.recap-row-value { padding-top: .1rem; }
+.recap-row .recap-row-tools { grid-column: 2 / 4; margin: 0; flex-wrap: nowrap; gap: .3rem; }
+.recap-row-tools .watch-date, .recap-row-tools .pill-select select, .pill-input { height: 30px; font-size: .78rem; }
+.recap-row-tools .watch-date { padding: 0 .55rem; gap: .25rem; flex: none; }
+.recap-row-tools .pill-select select { padding: 0 1.45rem 0 .6rem; }
+.recap-row-tools .pill-select svg { right: .5rem; }
+.pill-input {
+  display: inline-flex; align-items: center; gap: .15rem; padding: 0 .6rem;
+  border-radius: 999px; border: 1px solid var(--ink); color: var(--ink); font-weight: 600;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .25));
+}
+.pill-input input { width: 2.6em; padding: 0; border: 0; background: none; color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; text-align: right; outline: none; }
+.pill-suffix { white-space: nowrap; }

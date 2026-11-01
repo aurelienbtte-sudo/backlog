@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useStore, addLog, updateLog } from '../store.js'
 import { Grid, itemPath } from '../components/MediaCard.jsx'
@@ -27,24 +28,65 @@ function WatchDate({ entry, diary }) {
         <rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
         <path d="M3.5 10h17M8 3v4M16 3v4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <span>{last ? `Vu le ${shortDate(last.date)}` : 'Ajouter la date'}</span>
+      <span>{last ? shortDate(last.date) : 'Date'}</span>
       <input type="date" value={last?.date || ''} max={today()} onChange={change} aria-label={`Date de visionnage de ${entry.item.title}`} />
     </label>
   )
 }
 
 // Deux pilules (même style que le filtre des notes du profil) : visionnages au total et dans l'année
+// Choix de 1 à 10 dans une liste ; « Autre… » transforme la pilule en champ pour taper le nombre
 function CountPill({ value, min, label, onChange, suffix }) {
-  const options = Array.from({ length: Math.max(30, value) - min + 1 }, (_, i) => i + min)
+  const [typing, setTyping] = useState(false)
+  const [draft, setDraft] = useState('')
+  const options = Array.from({ length: Math.max(0, 10 - min + 1) }, (_, i) => i + min)
+  if (value > 10 || value < min) options.push(value) // valeur actuelle hors liste (tapée à la main)
+  options.sort((a, b) => a - b)
+
+  const commit = () => {
+    const n = Math.floor(Number(draft))
+    if (draft !== '' && Number.isFinite(n) && n >= min && n <= 999) onChange(n)
+    setTyping(false)
+  }
+
+  if (typing) {
+    return (
+      <label className="pill-select pill-input">
+        <span className="sr-only">{label}</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={min}
+          max={999}
+          autoFocus
+          value={draft}
+          placeholder={String(value)}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+        />
+        <span className="pill-suffix">× {suffix}</span>
+      </label>
+    )
+  }
   return (
     <label className="pill-select">
       <span className="sr-only">{label}</span>
-      <select value={value} onChange={(e) => onChange(Number(e.target.value))}>
+      <select
+        value={value}
+        onChange={(e) => {
+          if (e.target.value === 'autre') {
+            setDraft('')
+            setTyping(true)
+          } else onChange(Number(e.target.value))
+        }}
+      >
         {options.map((n) => (
-          <option key={n} value={n}>{n} fois {suffix}</option>
+          <option key={n} value={n}>{n}× {suffix}</option>
         ))}
+        <option value="autre">Autre…</option>
       </select>
-      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </label>
   )
 }
@@ -125,17 +167,16 @@ export default function Recap() {
             {films.map(({ entry, views, minutes }) => (
               <div key={entry.item.id} className="recap-row">
                 <Link to={itemPath(entry.item)}><Cover item={entry.item} size="sm" /></Link>
-                <div className="recap-row-body">
-                  <Link to={itemPath(entry.item)} className="recap-row-link">
-                    <strong>{entry.item.title}</strong>
-                    <span className="muted small">{formatHours(entry.item.runtime)}</span>
-                  </Link>
-                  <div className="recap-row-tools">
-                    <WatchDate entry={entry} diary={diary} />
-                    <ViewCounts entry={entry} diary={diary} views={views} year={year} />
-                  </div>
-                </div>
+                <Link to={itemPath(entry.item)} className="recap-row-link">
+                  <strong>{entry.item.title}</strong>
+                  <span className="muted small">{formatHours(entry.item.runtime)} par visionnage</span>
+                </Link>
                 <span className="recap-row-value">{formatHours(minutes)}</span>
+                {/* date et compteurs sur toute la largeur, sous le titre */}
+                <div className="recap-row-tools">
+                  <WatchDate entry={entry} diary={diary} />
+                  <ViewCounts entry={entry} diary={diary} views={views} year={year} />
+                </div>
               </div>
             ))}
           </div>
