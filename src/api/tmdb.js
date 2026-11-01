@@ -79,10 +79,16 @@ export async function details(type, id) {
     (v.iso_639_1 === vo ? 0 : v.iso_639_1 === 'en' ? 1 : v.iso_639_1 && v.iso_639_1 !== 'fr' ? 2 : v.iso_639_1 === 'fr' ? 4 : 3) * 10 +
     (v.type === 'Trailer' ? 0 : 1) * 5 +
     (v.official ? 0 : 1)
-  const trailer = [...videos].sort((a, b) => rank(a) - rank(b))[0]
+  const sorted = [...videos].sort((a, b) => rank(a) - rank(b))
+  const trailer = sorted[0]
   if (trailer) {
     item.trailer = `https://www.youtube.com/watch?v=${trailer.key}`
     item.trailerKey = trailer.key
+    // versions proposées par le bouton VO / VF du lecteur (seulement si elles diffèrent)
+    // pour un film français, la VO est la version française : pas de bouton
+    const voVideo = vo === 'fr' ? sorted.find((v) => v.iso_639_1 === 'fr') : sorted.find((v) => v.iso_639_1 !== 'fr')
+    const vfVideo = sorted.find((v) => v.iso_639_1 === 'fr')
+    if (voVideo && vfVideo && voVideo.key !== vfVideo.key) item.trailerKeys = { vo: voVideo.key, vf: vfVideo.key }
   }
   item.cast = (r.credits?.cast || []).slice(0, 10).map((c) => c.name)
   item.facts =
