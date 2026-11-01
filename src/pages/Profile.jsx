@@ -5,9 +5,9 @@ import DiaryRow from '../components/DiaryRow.jsx'
 import Avatar from '../components/Avatar.jsx'
 import SettingsButton from '../components/SettingsButton.jsx'
 import { SYNC_ENABLED, useSync } from '../sync.js'
-import { Grid } from '../components/MediaCard.jsx'
-import TypeTabs from '../components/TypeTabs.jsx'
-import { ARTIFACT } from '../types.js'
+import { itemPath } from '../components/MediaCard.jsx'
+import Cover from '../components/Cover.jsx'
+import { ARTIFACT, TYPES, TYPE_KEYS } from '../types.js'
 import { countThisYear, filmHours, useFilmRuntimes } from '../stats.js'
 
 export const Chevron = () => (
@@ -29,7 +29,11 @@ export default function Profile() {
   const avg = rated.length ? rated.reduce((s, e) => s + e.rating, 0) / rated.length / 2 : 0
   const histogram = Array.from({ length: 10 }, (_, i) => rated.filter((e) => e.rating === i + 1).length)
   const max = Math.max(1, ...histogram)
-  const favorites = all.filter((e) => e.liked && inType(e)).sort((a, b) => b.rating - a.rating).map((e) => e.item)
+  const byRating = (a, b) => b.rating - a.rating || b.updatedAt - a.updatedAt
+  const liked = all.filter((e) => e.liked).sort(byRating)
+  const podium = (liked.length >= 3 ? liked : [...liked, ...all.filter((e) => !e.liked && e.rating > 0).sort(byRating)])
+    .slice(0, 3)
+    .map((e) => e.item)
 
   const { ready, user } = useSync()
   useFilmRuntimes()
@@ -45,7 +49,7 @@ export default function Profile() {
   return (
     <>
       <div className="profile-head">
-        <Avatar editable size={128} />
+        <Avatar editable size={96} />
         <div className="profile-id">
           <div className="profile-name">
             <h1>{settings.name || 'Mon profil'}</h1>
@@ -94,13 +98,30 @@ export default function Profile() {
         </div>
       </div>
 
-      <TypeTabs value={type} onChange={setType} withAll />
+      {/* Tes 3 coups de cœur les mieux notés (ou, à défaut, tes 3 meilleures notes) */}
+      {podium.length > 0 && (
+        <div className="podium">
+          {podium.map((item) => (
+            <Link key={item.id} to={itemPath(item)} title={item.title}>
+              <Cover item={item} />
+            </Link>
+          ))}
+        </div>
+      )}
 
       <section className="ratings">
-        <div className="section-head">
-          <h2>Notes</h2>
-          <span className="muted">{rated.length} noté{rated.length > 1 ? "s" : ""} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</span>
-        </div>
+        <h2 className="ratings-title">Notes</h2>
+        <label className="ratings-filter">
+          <span className="sr-only">Filtrer les notes</span>
+          <select value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="all">Toutes les notes</option>
+            {TYPE_KEYS.map((t) => (
+              <option key={t} value={t}>{TYPES[t].label}</option>
+            ))}
+          </select>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </label>
+        <p className="muted small">{rated.length} noté{rated.length > 1 ? 's' : ''} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</p>
         <div className="histogram" aria-label="Répartition des notes">
           {histogram.map((n, i) => (
             <div key={i} className="bar" title={`${(i + 1) / 2} ★ : ${n}`}>
@@ -132,11 +153,6 @@ export default function Profile() {
         ) : (
           <p className="muted">Rien pour l'instant. Choisis Jeux, Cinéma ou Musique en bas, ouvre une œuvre et ajoute-la à ton journal.</p>
         )}
-      </section>
-
-      <section>
-        <h2>Coups de cœur ♥</h2>
-        <Grid items={favorites} empty="Aucun coup de cœur pour l'instant." />
       </section>
     </>
   )
