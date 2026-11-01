@@ -5,6 +5,7 @@ import { useStore, updateEntry, addLog, removeLog, sortedDiary } from '../store.
 import DiaryRow from '../components/DiaryRow.jsx'
 import TrailerPlayer from '../components/TrailerPlayer.jsx'
 import { appleMusicSearch } from '../api/applemusic.js'
+import { useImagePalette } from '../palette.js'
 import { StarRating } from '../components/Stars.jsx'
 import { TYPES, todayISO } from '../types.js'
 
@@ -21,6 +22,9 @@ export default function Item() {
   const [showPoster, setShowPoster] = useState(false)
   const [writing, setWriting] = useState(false)
   const [playing, setPlaying] = useState(false)
+  // Test : la fiche prend les couleurs de l'affiche (couleur générée pour les fiches sans image)
+  const titleHue = item ? [...item.title].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7) : undefined
+  useImagePalette(item ? item.cover || item.posterLarge || null : null, titleHue)
 
   useEffect(() => {
     let alive = true
