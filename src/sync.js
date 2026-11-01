@@ -37,7 +37,8 @@ export function useSync() {
 const entryToRow = (userId, e) => ({
   user_id: userId,
   item_id: e.item.id,
-  item: e.item,
+  // les visionnages anciens sont rangés avec l'œuvre, pour ne pas ajouter de colonne à la base
+  item: { ...e.item, pastViews: e.pastViews || 0 },
   rating: e.rating || 0,
   liked: Boolean(e.liked),
   wishlist: Boolean(e.wishlist),
@@ -46,7 +47,8 @@ const entryToRow = (userId, e) => ({
 })
 
 const rowToEntry = (r) => ({
-  item: r.item,
+  item: (({ pastViews, ...item }) => item)(r.item),
+  pastViews: r.item?.pastViews || 0,
   rating: r.rating,
   liked: r.liked,
   wishlist: r.wishlist,
