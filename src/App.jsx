@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Header from './components/Header.jsx'
 import TabBar from './components/TabBar.jsx'
 import SearchBar from './components/SearchBar.jsx'
 import Browse from './pages/Browse.jsx'
@@ -22,8 +21,9 @@ export default function App() {
 
   return (
     <>
-      {/* Sur la fiche d'une œuvre, l'image prend tout le haut de l'écran : pas d'en-tête */}
-      {!/^\/(film|serie|jeu|album)\//.test(pathname) && <Header />}
+      {/* Bande derrière l'heure et la batterie, pour que le contenu qui défile reste lisible.
+          Absente sur la fiche d'une œuvre, où l'image passe sous l'heure. */}
+      {!/^\/(film|serie|jeu|album)\//.test(pathname) && <div className="status-band" aria-hidden="true" />}
       <main className="container">
         <Routes>
           <Route path="/" element={<Profile />} />

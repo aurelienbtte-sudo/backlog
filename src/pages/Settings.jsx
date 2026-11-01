@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useStore, setSetting, exportData, importData, resetData } from '../store.js'
 import ConfirmButton from '../components/ConfirmButton.jsx'
 import { ARTIFACT } from '../types.js'
@@ -7,6 +8,7 @@ import Avatar from '../components/Avatar.jsx'
 import { SYNC_ENABLED } from '../sync.js'
 
 export default function Settings() {
+  const navigate = useNavigate()
   const settings = useStore((s) => s.settings)
   const fileRef = useRef()
   const [msg, setMsg] = useState('')
@@ -52,7 +54,12 @@ export default function Settings() {
 
   return (
     <div className="settings">
-      <h1>Réglages</h1>
+      <button className="recap-back" onClick={() => navigate(-1)} aria-label="Retour">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <h1 className="page-title">Réglages</h1>
 
       {SYNC_ENABLED && <Account />}
 

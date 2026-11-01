@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore, sortedDiary } from '../store.js'
 import DiaryRow from '../components/DiaryRow.jsx'
 import Avatar from '../components/Avatar.jsx'
+import SettingsButton from '../components/SettingsButton.jsx'
 import { SYNC_ENABLED, useSync } from '../sync.js'
 import { Grid } from '../components/MediaCard.jsx'
 import TypeTabs from '../components/TypeTabs.jsx'
@@ -45,8 +46,11 @@ export default function Profile() {
     <>
       <div className="profile-head">
         <Avatar editable size={128} />
-        <div>
-          <h1>{settings.name || 'Mon profil'}</h1>
+        <div className="profile-id">
+          <div className="profile-name">
+            <h1>{settings.name || 'Mon profil'}</h1>
+            <SettingsButton />
+          </div>
           {settings.bio && <p className="muted">{settings.bio}</p>}
         </div>
       </div>
