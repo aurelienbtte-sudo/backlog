@@ -87,14 +87,14 @@ export function useImagePalette(src, fallbackHue) {
     const root = document.documentElement
     const metas = [...document.querySelectorAll('meta[name="theme-color"]')]
     const original = metas.map((m) => m.content)
-    const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
     let color = null
     let cancelled = false
     let applied = []
 
     const apply = () => {
       if (!color || cancelled) return
-      const palette = paletteFor(color, darkQuery.matches)
+      // les fiches restent en version sombre, même en mode clair : les affiches y rendent mieux
+      const palette = paletteFor(color, true)
       applied = Object.keys(palette)
       for (const [k, v] of Object.entries(palette)) root.style.setProperty(k, v)
       metas.forEach((m) => (m.content = palette['--bg']))
@@ -122,11 +122,9 @@ export function useImagePalette(src, fallbackHue) {
       color = { h: fallbackHue, s: 45 }
       apply()
     }
-    darkQuery.addEventListener('change', apply)
 
     return () => {
       cancelled = true
-      darkQuery.removeEventListener('change', apply)
       applied.forEach((k) => root.style.removeProperty(k))
       metas.forEach((m, i) => (m.content = original[i]))
     }
