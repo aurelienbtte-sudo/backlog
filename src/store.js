@@ -74,6 +74,12 @@ export function addLog(item, { date, rating, review, liked, again }) {
   updateEntry(item, patch)
 }
 
+export function updateLog(id, patch) {
+  set((s) => ({ ...s, diary: s.diary.map((l) => (l.id === id ? { ...l, ...patch } : l)) }))
+  const log = getState().diary.find((l) => l.id === id)
+  if (log) emit({ type: 'log', log })
+}
+
 export function removeLog(id) {
   set((s) => ({ ...s, diary: s.diary.filter((l) => l.id !== id) }))
   emit({ type: 'removeLog', id })
