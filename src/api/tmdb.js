@@ -9,7 +9,8 @@ function call(path, params = {}) {
   const key = getKey('tmdb')
   const url = new URL(BASE + path)
   url.searchParams.set('language', 'fr-FR')
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
+  // une valeur vide retire le paramètre (ex. language: '' pour avoir les vidéos dans toutes les langues)
+  Object.entries(params).forEach(([k, v]) => (v === '' ? url.searchParams.delete(k) : url.searchParams.set(k, v)))
   // Clé v3 courte -> paramètre d'URL ; "Read Access Token" (long) -> en-tête Authorization
   if (key.length > 40) return fetchJSON(url, { headers: { Authorization: `Bearer ${key}` } })
   url.searchParams.set('api_key', key)
@@ -53,7 +54,13 @@ export async function trending(type) {
 }
 
 export async function details(type, id) {
-  const r = await call(`/${KIND[type]}/${id}`, { append_to_response: 'credits,videos', include_video_language: 'fr,en,null' })
+  const r = await call(`/${KIND[type]}/${id}`, { append_to_response: 'credits,videos' })
+  // les vidéos sont demandées à part, sans filtre de langue, pour pouvoir choisir la VO
+  try {
+    r.videos = await call(`/${KIND[type]}/${id}/videos`, { language: '' })
+  } catch {
+    // on garde celles déjà reçues
+  }
   const item = normalize(type, r)
   const crew = r.credits?.crew || []
   const directors = crew.filter((c) => c.job === 'Director').map((c) => c.name)
@@ -65,8 +72,14 @@ export async function details(type, id) {
   item.posterLarge = r.poster_path ? `${IMG}w780${r.poster_path}` : null
   item.released = r.release_date || r.first_air_date || ''
   // Bande-annonce YouTube, en français si possible
+  // Bande-annonce en VO : langue d'origine du film d'abord, puis l'anglais, puis toute autre langue, le français en dernier
   const videos = (r.videos?.results || []).filter((v) => v.site === 'YouTube' && ['Trailer', 'Teaser'].includes(v.type))
-  const trailer = videos.find((v) => v.iso_639_1 === 'fr' && v.type === 'Trailer') || videos.find((v) => v.type === 'Trailer') || videos[0]
+  const vo = r.original_language
+  const rank = (v) =>
+    (v.iso_639_1 === vo ? 0 : v.iso_639_1 === 'en' ? 1 : v.iso_639_1 && v.iso_639_1 !== 'fr' ? 2 : v.iso_639_1 === 'fr' ? 4 : 3) * 10 +
+    (v.type === 'Trailer' ? 0 : 1) * 5 +
+    (v.official ? 0 : 1)
+  const trailer = [...videos].sort((a, b) => rank(a) - rank(b))[0]
   if (trailer) {
     item.trailer = `https://www.youtube.com/watch?v=${trailer.key}`
     item.trailerKey = trailer.key
