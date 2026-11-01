@@ -48,7 +48,7 @@ export default function Profile() {
     !ARTIFACT && !SYNC_ENABLED && diary.length >= 3 && Date.now() - (settings.lastBackupAt || 0) > 30 * 24 * 3600 * 1000
 
   return (
-    <>
+    <div className="profile">
       <div className="profile-head">
         <Avatar editable size={96} />
         <div className="profile-id">
@@ -100,7 +100,8 @@ export default function Profile() {
       </div>
 
       {/* Top 4 : choisi par l'utilisateur, sinon ses coups de cœur les mieux notés */}
-      <div className="top3-head">
+      <section className="block">
+      <div className="block-head">
         <h2 className="ratings-title">Top 4</h2>
         <Link to="/top3" className="top3-edit">modifier <Chevron /></Link>
       </div>
@@ -115,8 +116,10 @@ export default function Profile() {
           ))}
         </div>
       )}
+      </section>
 
-      <section className="ratings">
+      <section className="block ratings">
+        <div className="block-head ratings-head">
         <h2 className="ratings-title">Notes</h2>
         <label className="ratings-filter">
           <span className="sr-only">Filtrer les notes</span>
@@ -126,8 +129,9 @@ export default function Profile() {
               <option key={t} value={t}>{TYPES[t].label}</option>
             ))}
           </select>
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </label>
+        </div>
         <p className="muted small">{rated.length} noté{rated.length > 1 ? 's' : ''} · moyenne {avg ? avg.toFixed(1).replace('.', ',') : '–'} ★</p>
         <div className="histogram" aria-label="Répartition des notes">
           {histogram.map((n, i) => (
@@ -161,6 +165,6 @@ export default function Profile() {
           <p className="muted">Rien pour l'instant. Choisis Jeux, Cinéma ou Musique en bas, ouvre une œuvre et ajoute-la à ton journal.</p>
         )}
       </section>
-    </>
+    </div>
   )
 }
