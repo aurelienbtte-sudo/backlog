@@ -17,8 +17,7 @@ function rgbToHsl(r, g, b) {
   return [h * 60, s * 100, l * 100]
 }
 
-// Teinte dominante : on classe les pixels par teinte (24 familles). La surface compte plus que la vivacité,
-// pour qu'un petit détail très vif ne l'emporte pas sur la couleur principale de l'affiche.
+// Teinte dominante : on classe les pixels par teinte (12 familles) en privilégiant les couleurs vives
 function dominantColor(img) {
   const canvas = document.createElement('canvas')
   canvas.width = 24
@@ -26,65 +25,24 @@ function dominantColor(img) {
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data // erreur si l'image n'autorise pas la lecture
-  const N = 24
-  const bins = Array.from({ length: N }, () => ({ w: 0, x: 0, y: 0, s: 0 }))
+  const bins = Array.from({ length: 12 }, () => ({ w: 0, h: 0, s: 0 }))
   let grey = 0
   for (let i = 0; i < data.length; i += 4) {
     const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2])
-    // pixels presque gris, presque noirs ou presque blancs : ils ne donnent pas de teinte
-    if (s < 18 || l < 12 || l > 90) {
+    const w = (s / 100) * (1 - Math.abs(l - 50) / 50) // vif et ni trop sombre ni trop clair
+    if (w < 0.08) {
       grey++
       continue
     }
-    const w = 0.4 + 0.6 * (s / 100) // la surface d'abord, la vivacité ensuite
-    const bin = bins[Math.floor(h / (360 / N)) % N]
-    const rad = (h * Math.PI) / 180
+    const bin = bins[Math.floor(h / 30) % 12]
     bin.w += w
-    bin.x += Math.cos(rad) * w // moyenne sur le cercle des teintes (le rouge est à 0° et à 360°)
-    bin.y += Math.sin(rad) * w
+    bin.h += h * w
     bin.s += s * w
   }
-  // une teinte gagne avec ses voisines : une affiche « orange-rouge » ne se divise pas en deux
-  const score = bins.map((b, i) => b.w + 0.6 * (bins[(i + N - 1) % N].w + bins[(i + 1) % N].w))
-  const top = score.indexOf(Math.max(...score))
-  const group = [bins[(top + N - 1) % N], bins[top], bins[(top + 1) % N]]
-  const total = group.reduce((t, b) => t + b.w, 0)
-  const pixels = data.length / 4
-  // image presque en noir et blanc : palette neutre, légèrement chaude
-  if (total === 0 || grey > pixels * 0.85) return { h: 30, s: 8 }
-  const x = group.reduce((t, b) => t + b.x, 0)
-  const y = group.reduce((t, b) => t + b.y, 0)
-  const h = ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360
-  const s = group.reduce((t, b) => t + b.s, 0) / total
-  return { h, s: Math.min(s, 75) }
-}
-
-// Les sites d'affiches (TMDB…) n'autorisent pas la lecture des couleurs de leurs images.
-// On demande donc une miniature au service d'images gratuit wsrv.nl, qui l'autorise,
-// puis on essaie l'image d'origine en dernier recours.
-function readableSources(src) {
-  const bare = src.replace(/^https?:\/\//, '')
-  return [`https://wsrv.nl/?url=${encodeURIComponent(bare)}&w=60&output=jpg`, src]
-}
-
-function loadReadable(sources) {
-  return new Promise((resolve) => {
-    const tryNext = (i) => {
-      if (i >= sources.length) return resolve(null)
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        try {
-          resolve(dominantColor(img))
-        } catch {
-          tryNext(i + 1) // image chargée mais illisible
-        }
-      }
-      img.onerror = () => tryNext(i + 1)
-      img.src = sources[i]
-    }
-    tryNext(0)
-  })
+  const best = bins.reduce((a, b) => (b.w > a.w ? b : a))
+  // image presque en noir et blanc : palette neutre
+  if (best.w === 0 || grey > (data.length / 4) * 0.85) return { h: best.w ? best.h / best.w : 30, s: 8 }
+  return { h: best.h / best.w, s: Math.min(best.s / best.w, 75) }
 }
 
 const hsl = (h, s, l, a = 1) => `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${a})`
@@ -143,11 +101,21 @@ export function useImagePalette(src, fallbackHue) {
     }
 
     if (src) {
-      // image illisible partout : on garde la DA plutôt qu'une couleur au hasard
-      loadReadable(readableSources(src)).then((c) => {
-        color = c
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        try {
+          color = dominantColor(img)
+        } catch {
+          color = fallbackHue === undefined ? null : { h: fallbackHue, s: 45 } // image illisible : on garde la DA
+        }
         apply()
-      })
+      }
+      img.onerror = () => {
+        if (fallbackHue !== undefined) color = { h: fallbackHue, s: 45 }
+        apply()
+      }
+      img.src = src
     } else {
       color = { h: fallbackHue, s: 45 }
       apply()
