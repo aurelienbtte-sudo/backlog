@@ -55,9 +55,10 @@ export async function trending(type) {
 
 export async function details(type, id) {
   const r = await call(`/${KIND[type]}/${id}`, { append_to_response: 'credits,videos' })
-  // les vidéos sont demandées à part, sans filtre de langue, pour pouvoir choisir la VO
+  // les vidéos sont demandées à part, dans plusieurs langues, pour pouvoir choisir la VO ou la VF
   try {
-    r.videos = await call(`/${KIND[type]}/${id}/videos`, { language: '' })
+    // sans précision, TMDB ne renvoie que les vidéos en anglais : on demande la VO, le français et l'anglais
+    r.videos = await call(`/${KIND[type]}/${id}/videos`, { language: '', include_video_language: [r.original_language, 'fr', 'en', 'null'].filter(Boolean).join(',') })
   } catch {
     // on garde celles déjà reçues
   }
