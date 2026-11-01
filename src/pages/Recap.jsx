@@ -129,6 +129,14 @@ const SORTS = {
   titre: { label: 'Titre (A → Z)', title: 'Tous tes films', compare: byTitle },
 }
 
+// Heures converties en jours d'affilée : 361 h → « soit 15 jours »
+const asDays = (h) => {
+  if (h < 24) return h ? 'soit < 1 jour' : ''
+  const d = h / 24
+  const n = d < 10 ? d.toFixed(1).replace('.0', '').replace('.', ',') : Math.round(d)
+  return `soit ${n} jour${d >= 2 ? 's' : ''}`
+}
+
 const formatHours = (min) => (min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}` : `${min} min`)
 
 // Récapitulatif d'une catégorie du profil (séries, jeux, musique, films) ou des heures de films
@@ -186,14 +194,15 @@ export default function Recap() {
       })
       .sort(SORTS[sort].compare)
     const missing = done.length - films.length
+    const avgMin = films.length ? Math.round(films.reduce((s, f) => s + f.entry.item.runtime, 0) / films.length) : 0
     return (
       <>
         {back}
         <h1 className="page-title">Heures visionnées</h1>
         <div className="stats recap-stats">
-          <div className="stat"><strong>{hours.total} h</strong><span>au total</span></div>
-          <div className="stat"><strong>{hours.thisYear} h</strong><span>en {year}</span></div>
-          <div className="stat"><strong>{films.length ? Math.round(films.reduce((s, f) => s + f.entry.item.runtime, 0) / films.length) : 0}</strong><span>min par film</span></div>
+          <div className="stat"><strong>{hours.total} h</strong><span>au total</span><em className="stat-days">{asDays(hours.total)}</em></div>
+          <div className="stat"><strong>{hours.thisYear} h</strong><span>en {year}</span><em className="stat-days">{asDays(hours.thisYear)}</em></div>
+          <div className="stat"><strong>{avgMin}</strong><span>min par film</span><em className="stat-days">{avgMin ? `soit ${formatHours(avgMin)}` : ''}</em></div>
         </div>
         <section>
           <div className="section-head recap-sort-head">

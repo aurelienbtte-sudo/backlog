@@ -597,3 +597,5 @@ button.top3-pick:disabled { opacity: .45; }
 .recap-sort-head h2 { margin: 0; flex: 1; min-width: 12rem; }
 .recap-sort-head .pill-select select { height: 30px; font-size: .78rem; padding: 0 1.45rem 0 .7rem; }
 .recap-sort-head .pill-select svg { right: .5rem; }
+
+.stat-days { margin-top: .5rem; font-size: clamp(.78rem, 3.4vw, .95rem); font-weight: 300; opacity: .85; color: var(--ink); }
