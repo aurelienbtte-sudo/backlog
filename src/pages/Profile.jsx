@@ -6,7 +6,8 @@ import Avatar from '../components/Avatar.jsx'
 import { SYNC_ENABLED, useSync } from '../sync.js'
 import { Grid } from '../components/MediaCard.jsx'
 import TypeTabs from '../components/TypeTabs.jsx'
-import { TYPES, TYPE_KEYS, ARTIFACT } from '../types.js'
+import { ARTIFACT } from '../types.js'
+import { countThisYear, filmHours, useFilmRuntimes } from '../stats.js'
 
 // Onglet « Accueil » : ton profil, tes raccourcis, ton activité et tes statistiques
 
@@ -24,6 +25,10 @@ export default function Profile() {
   const favorites = all.filter((e) => e.liked && inType(e)).sort((a, b) => b.rating - a.rating).map((e) => e.item)
 
   const { ready, user } = useSync()
+  useFilmRuntimes()
+  const doneCount = (t) => all.filter((e) => e.done && e.item.type === t).length
+  const yearCount = (t) => countThisYear(entries, diary, t, year)
+  const hours = filmHours(entries, diary, year)
   const recent = sortedDiary(diary).slice(0, 3)
   const wishlist = all.filter((e) => e.wishlist && !e.done).length
   // Rappel : sauvegarder si on a des données et aucune sauvegarde depuis 30 jours
@@ -51,14 +56,32 @@ export default function Profile() {
         </p>
       )}
 
+      {/* Compteurs façon cartes en verre (maquette Figma) */}
       <div className="stats">
-        {TYPE_KEYS.map((t) => (
-          <div key={t} className="stat" style={{ '--accent': TYPES[t].color }}>
-            <strong>{all.filter((e) => e.done && e.item.type === t).length}</strong>
-            <span>{TYPES[t].icon} {TYPES[t].label}</span>
-            <small className="muted">{diary.filter((l) => l.item.type === t && l.date.startsWith(year)).length} en {year}</small>
+        {[
+          ['serie', 'séries'],
+          ['jeu', 'jeux'],
+          ['album', 'musique'],
+        ].map(([t, label]) => (
+          <div key={t} className="stat">
+            <strong>{doneCount(t)}</strong>
+            <span>{label}</span>
+            <small>{yearCount(t)} en {year}</small>
           </div>
         ))}
+        <div className="stat stat-wide">
+          <div>
+            <strong>{doneCount('film')}</strong>
+            <span>films</span>
+            <small>{yearCount('film')} en {year}</small>
+          </div>
+          <div className="stat-divider" />
+          <div>
+            <strong>{hours.total} h</strong>
+            <span>visionnées</span>
+            <small>{hours.thisYear} h en {year}</small>
+          </div>
+        </div>
       </div>
 
       <div className="shortcuts">

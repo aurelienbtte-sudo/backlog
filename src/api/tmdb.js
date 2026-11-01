@@ -61,6 +61,7 @@ export async function details(type, id) {
   item.subtitle = (type === 'film' ? directors : creators).join(', ')
   item.genres = (r.genres || []).map((g) => g.name)
   item.backdrop = r.backdrop_path ? `${IMG}w1280${r.backdrop_path}` : null
+  if (type === 'film') item.runtime = r.runtime || 0
   item.posterLarge = r.poster_path ? `${IMG}w780${r.poster_path}` : null
   item.released = r.release_date || r.first_air_date || ''
   // Bande-annonce YouTube, en français si possible

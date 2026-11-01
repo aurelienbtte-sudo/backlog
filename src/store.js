@@ -47,7 +47,7 @@ export function onChange(listener) {
 const emit = (change) => changeListeners.forEach((l) => l(change))
 
 // On ne garde que l'essentiel d'une œuvre pour l'afficher sans rappeler l'API
-const slim = ({ id, type, sourceId, title, year, cover, subtitle }) => ({ id, type, sourceId, title, year, cover, subtitle })
+const slim = ({ id, type, sourceId, title, year, cover, subtitle, runtime }) => ({ id, type, sourceId, title, year, cover, subtitle, runtime })
 
 // crypto.randomUUID n'existe que sur les pages en HTTPS
 const newId = () => crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
@@ -59,7 +59,7 @@ export function updateEntry(item, patch) {
     const prev = s.entries[item.id] || blankEntry
     return {
       ...s,
-      entries: { ...s.entries, [item.id]: { ...prev, ...patch, item: slim(item), updatedAt: Date.now() } },
+      entries: { ...s.entries, [item.id]: { ...prev, updatedAt: Date.now(), ...patch, item: slim(item) } },
     }
   })
   emit({ type: 'entry', entry: state.entries[item.id] })
