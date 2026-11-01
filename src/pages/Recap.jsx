@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useStore, addLog, updateLog } from '../store.js'
+import { useStore, addLog, updateLog, removeLog } from '../store.js'
 import { Grid, itemPath } from '../components/MediaCard.jsx'
 import Cover from '../components/Cover.jsx'
 import { Stars } from '../components/Stars.jsx'
@@ -29,6 +29,39 @@ function WatchDate({ entry, diary }) {
       </svg>
       <span>{last ? `Vu le ${shortDate(last.date)}` : 'Ajouter la date'}</span>
       <input type="date" value={last?.date || ''} max={today()} onChange={change} aria-label={`Date de visionnage de ${entry.item.title}`} />
+    </label>
+  )
+}
+
+// Nombre de visionnages, modifiable : on ajoute ou retire des entrées « revu » dans le journal.
+// Les entrées retirées en priorité sont les plus récentes sans critique.
+function ViewCount({ entry, diary, total }) {
+  const logs = diary.filter((l) => l.itemId === entry.item.id)
+  const change = (e) => {
+    const target = Number(e.target.value)
+    if (target > total) {
+      const last = [...logs].sort((a, b) => b.date.localeCompare(a.date))[0]
+      const date = last?.date || today()
+      // un film coché « vu » sans journal compte déjà 1 visionnage : on crée toutes les entrées d'un coup
+      const toAdd = logs.length === 0 ? target : target - logs.length
+      for (let i = 0; i < toAdd; i++) {
+        addLog(entry.item, { date, rating: entry.rating || 0, review: '', liked: entry.liked || false, again: logs.length + i > 0 })
+      }
+    } else if (target < total) {
+      const removable = [...logs].sort((a, b) => Boolean(a.review) - Boolean(b.review) || b.createdAt - a.createdAt)
+      removable.slice(0, logs.length - Math.max(target, 1)).forEach((l) => removeLog(l.id))
+    }
+  }
+  const options = Array.from({ length: Math.max(20, total) }, (_, i) => i + 1)
+  return (
+    <label className="pill-select">
+      <span className="sr-only">Nombre de visionnages de {entry.item.title}</span>
+      <select value={total} onChange={change}>
+        {options.map((n) => (
+          <option key={n} value={n}>{n} fois</option>
+        ))}
+      </select>
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </label>
   )
 }
@@ -87,12 +120,12 @@ export default function Recap() {
                 <div className="recap-row-body">
                   <Link to={itemPath(entry.item)} className="recap-row-link">
                     <strong>{entry.item.title}</strong>
-                    <span className="muted small">
-                      {formatHours(entry.item.runtime)}
-                      {views.total > 1 ? ` · vu ${views.total} fois` : ''}
-                    </span>
+                    <span className="muted small">{formatHours(entry.item.runtime)}</span>
                   </Link>
-                  <WatchDate entry={entry} diary={diary} />
+                  <div className="recap-row-tools">
+                    <WatchDate entry={entry} diary={diary} />
+                    <ViewCount entry={entry} diary={diary} total={views.total} />
+                  </div>
                 </div>
                 <span className="recap-row-value">{formatHours(minutes)}</span>
               </div>
