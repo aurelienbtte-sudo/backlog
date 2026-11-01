@@ -10,6 +10,7 @@ import Diary from './pages/Diary.jsx'
 import Watchlist from './pages/Watchlist.jsx'
 import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
+import Recap from './pages/Recap.jsx'
 import { ARTIFACT } from './types.js'
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/journal" element={<Diary />} />
           <Route path="/a-decouvrir" element={<Watchlist />} />
           <Route path="/profil" element={<Profile />} />
+          <Route path="/bilan/:type" element={<Recap />} />
           <Route path="/reglages" element={<Settings />} />
           <Route path="/:type/:sourceId" element={<Item />} />
           <Route path="*" element={<p>Page introuvable.</p>} />

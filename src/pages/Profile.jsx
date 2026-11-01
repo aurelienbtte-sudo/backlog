@@ -9,6 +9,12 @@ import TypeTabs from '../components/TypeTabs.jsx'
 import { ARTIFACT } from '../types.js'
 import { countThisYear, filmHours, useFilmRuntimes } from '../stats.js'
 
+export const Chevron = () => (
+  <svg className="chevron" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
 // Onglet « Accueil » : ton profil, tes raccourcis, ton activité et tes statistiques
 
 export default function Profile() {
@@ -63,24 +69,24 @@ export default function Profile() {
           ['jeu', 'jeux'],
           ['album', 'musique'],
         ].map(([t, label]) => (
-          <div key={t} className="stat">
+          <Link key={t} to={`/bilan/${t}`} className="stat">
             <strong>{doneCount(t)}</strong>
             <span>{label}</span>
-            <small>{yearCount(t)} en {year}</small>
-          </div>
+            <small>{yearCount(t)} en {year} <Chevron /></small>
+          </Link>
         ))}
         <div className="stat stat-wide">
-          <div>
+          <Link to="/bilan/film">
             <strong>{doneCount('film')}</strong>
             <span>films</span>
-            <small>{yearCount('film')} en {year}</small>
-          </div>
+            <small>{yearCount('film')} en {year} <Chevron /></small>
+          </Link>
           <div className="stat-divider" />
-          <div>
+          <Link to="/bilan/heures">
             <strong>{hours.total} h</strong>
             <span>visionnées</span>
-            <small>{hours.thisYear} h en {year}</small>
-          </div>
+            <small>{hours.thisYear} h en {year} <Chevron /></small>
+          </Link>
         </div>
       </div>
 
