@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { SearchIcon } from './TabBar.jsx'
+import { SCOPES, scopeOf } from '../search-scope.js'
 
 // Barre de recherche flottante, au-dessus de la barre d'onglets (maquette Figma).
-// La recherche se lance pendant la frappe et cherche dans tous les catalogues à la fois.
+// La recherche se lance pendant la frappe, dans la catégorie de l'onglet en cours (tout, depuis l'Accueil).
 export default function SearchBar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -12,6 +13,8 @@ export default function SearchBar() {
   const current = onSearchPage ? params.get('q') || '' : ''
   const [q, setQ] = useState(current)
   const inputRef = useRef(null)
+  const scope = scopeOf(pathname, params)
+  const go = (value) => navigate(`/recherche?q=${encodeURIComponent(value)}&dans=${scope}`, { replace: onSearchPage })
 
   // En quittant la page de recherche, la barre se vide
   useEffect(() => {
@@ -22,7 +25,7 @@ export default function SearchBar() {
   useEffect(() => {
     const value = q.trim()
     if (!value || value === current) return
-    const t = setTimeout(() => navigate(`/recherche?q=${encodeURIComponent(value)}`, { replace: onSearchPage }), 350)
+    const t = setTimeout(() => go(value), 350)
     return () => clearTimeout(t)
   }, [q])
 
@@ -30,7 +33,7 @@ export default function SearchBar() {
     e.preventDefault()
     inputRef.current.blur() // ferme le clavier
     const value = q.trim()
-    if (value && value !== current) navigate(`/recherche?q=${encodeURIComponent(value)}`, { replace: onSearchPage })
+    if (value && value !== current) go(value)
   }
 
   return (
@@ -41,7 +44,7 @@ export default function SearchBar() {
         type="search"
         enterKeyHint="search"
         aria-label="Rechercher"
-        placeholder="Rechercher un film, une série, un jeu…"
+        placeholder={SCOPES[scope].placeholder}
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { scopeOf } from '../search-scope.js'
 
 // Barre d'onglets flottante façon iOS 26 (Liquid Glass), d'après la maquette Figma.
 // On peut glisser le doigt dessus : une loupe en verre suit le doigt et grossit les onglets,
@@ -7,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const ITEMS = [
   { to: '/jeux', label: 'Jeux', color: 'var(--jeu)', match: (p) => p === '/jeux' || p.startsWith('/jeu/') },
   { to: '/cinema', label: 'Cinéma', color: 'var(--film)', match: (p) => p === '/cinema' || p.startsWith('/film/') || p.startsWith('/serie/') },
-  { to: '/musique', label: 'Musique', color: 'var(--album)', match: (p) => p === '/musique' || p.startsWith('/album/') },
+  { to: '/musique', label: 'Musique', color: 'var(--album)', match: (p) => p === '/musique' || p.startsWith('/album/') || p.startsWith('/artiste/') },
   {
     to: '/',
     label: 'Accueil',
@@ -51,7 +52,11 @@ export default function TabBar() {
   const [layout, setLayout] = useState(null) // positions des onglets dans la barre
   const [dragX, setDragX] = useState(null) // position du doigt pendant un glissement
 
-  const activeIndex = ITEMS.findIndex((t) => t.match(pathname))
+  const [params] = useSearchParams()
+  // sur la page de recherche, l'onglet de la catégorie cherchée reste allumé
+  const scope = pathname === '/recherche' ? scopeOf(pathname, params) : null
+  const scopePath = { jeux: '/jeux', cinema: '/cinema', musique: '/musique', tout: '/' }[scope]
+  const activeIndex = ITEMS.findIndex((t) => (scopePath ? t.to === scopePath : t.match(pathname)))
 
   // Mesure la position de chaque onglet (et recommence si la taille de la barre change)
   useLayoutEffect(() => {

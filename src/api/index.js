@@ -43,3 +43,5 @@ export function getItem(type, sourceId) {
 // Actualité musicale : nouveautés et albums les plus écoutés (Deezer)
 export const musicNews = () => dz.newReleases()
 export const musicTop = () => dz.topAlbums()
+export const searchArtists = (q) => dz.searchArtists(q)
+export const getArtist = (id) => dz.artist(id)

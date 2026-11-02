@@ -57,3 +57,40 @@ export async function details(dzId) {
 }
 
 const tracksOf = (a) => (a.tracks?.data || []).map((t) => ({ title: t.title, length: (t.duration || 0) * 1000 }))
+
+// --- Artistes et groupes ---
+
+const normalizeArtist = (a) => ({
+  id: a.id,
+  name: a.name,
+  picture: a.picture_xl || a.picture_big || a.picture_medium || null,
+  fans: a.nb_fan || 0,
+  albumCount: a.nb_album || 0,
+})
+
+export async function searchArtists(query) {
+  const data = await call(`/search/artist?q=${encodeURIComponent(query)}&limit=8`)
+  return (data.data || []).map(normalizeArtist)
+}
+
+// Page d'un artiste : infos, morceaux phares, et discographie (albums, puis singles et EP)
+export async function artist(id) {
+  const [info, albums, top] = await Promise.all([
+    call(`/artist/${id}`),
+    call(`/artist/${id}/albums?limit=100`),
+    call(`/artist/${id}/top?limit=5`).catch(() => ({ data: [] })),
+  ])
+  const all = (albums.data || [])
+    .map((a) => ({ ...normalize({ ...a, artist: { name: info.name } }), recordType: a.record_type }))
+    .sort((a, b) => (b.year || '').localeCompare(a.year || ''))
+  return {
+    ...normalizeArtist(info),
+    albums: all.filter((a) => a.recordType === 'album'),
+    singles: all.filter((a) => a.recordType !== 'album'),
+    top: (top.data || []).map((t) => ({
+      title: t.title,
+      length: (t.duration || 0) * 1000,
+      album: t.album ? normalize({ ...t.album, artist: { name: info.name } }) : null,
+    })),
+  }
+}
