@@ -8,6 +8,27 @@ import { getState, onChange, replaceData, setSetting } from './store.js'
 const URL = import.meta.env.VITE_SUPABASE_URL
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+// Liens reçus par e-mail (confirmation d'inscription, mot de passe oublié) : Supabase renvoie vers le site
+// avec les jetons dans l'adresse (#access_token=…). On les lit avant que la navigation ne démarre,
+// puis on remet une adresse propre vers la bonne page.
+const authLink = (() => {
+  const h = window.location.hash
+  if (!/access_token=|error_description=/.test(h)) return null
+  const p = new URLSearchParams(h.replace(/^#\/?/, ''))
+  const link = {
+    type: p.get('type'),
+    access_token: p.get('access_token'),
+    refresh_token: p.get('refresh_token'),
+    error: p.get('error_description'),
+  }
+  const page = link.type === 'recovery' && !link.error ? '#/nouveau-mot-de-passe' : '#/reglages'
+  window.history.replaceState(null, '', window.location.pathname + window.location.search + page)
+  return link
+})()
+export const AUTH_LINK = authLink
+// adresse du site, pour les liens envoyés par e-mail
+export const SITE_URL = window.location.origin + window.location.pathname
+
 export const supabase = URL && KEY ? createClient(URL, KEY, { auth: { detectSessionInUrl: false } }) : null
 export const SYNC_ENABLED = Boolean(supabase)
 
@@ -232,6 +253,17 @@ onChange((change) => {
 
 // --- Connexion ---
 
+if (supabase && authLink?.access_token) {
+  supabase.auth
+    .setSession({ access_token: authLink.access_token, refresh_token: authLink.refresh_token })
+    .catch(() => {})
+    .finally(() => {
+      // lien vérifié (valide ou non) : les pages qui l'attendent peuvent l'afficher
+      authLink.checked = true
+      setStatus({})
+    })
+}
+
 if (supabase) {
   supabase.auth.onAuthStateChange((event, session) => {
     const user = session?.user ?? null
@@ -243,6 +275,8 @@ if (supabase) {
 }
 
 const MESSAGES = {
+  'Email rate limit exceeded': 'Trop d’e-mails envoyés pour le moment. Réessaie dans une heure.',
+  'New password should be different from the old password.': 'Le nouveau mot de passe doit être différent de l’ancien.',
   'Invalid login credentials': 'E-mail ou mot de passe incorrect.',
   'User already registered': 'Un compte existe déjà avec cet e-mail. Connecte-toi plutôt.',
   'Email not confirmed': "Ton e-mail n'est pas encore confirmé. Ouvre le lien reçu par e-mail, puis reconnecte-toi.",
@@ -257,10 +291,10 @@ function translate(error) {
 }
 
 export async function signUp(email, password) {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: SITE_URL } })
   if (error) throw translate(error)
   if (!data.session) {
-    throw new Error("Compte créé ! Confirme ton adresse avec le lien reçu par e-mail, puis connecte-toi ici.")
+    throw new Error("Compte créé ! Ouvre le lien reçu par e-mail pour confirmer ton adresse, puis reviens te connecter ici.")
   }
 }
 
@@ -276,4 +310,30 @@ export async function signOut() {
   replaceData({ entries: {}, diary: [] })
   setSetting('syncedUser', null)
   setStatus({ state: 'idle', error: null })
+}
+
+// Mot de passe oublié : envoie un e-mail avec un lien vers la page « nouveau mot de passe »
+export async function sendPasswordReset(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL })
+  if (error) throw translate(error)
+}
+
+export async function setNewPassword(password) {
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) throw translate(error)
+}
+
+// Supprime le compte et toutes ses données en ligne (fonction delete_my_account de la base),
+// puis efface aussi les données de cet appareil
+export async function deleteAccount() {
+  await queue
+  const { error } = await supabase.rpc('delete_my_account')
+  if (error) {
+    if (/delete_my_account|function/i.test(error.message)) throw new Error('La suppression de compte n’est pas encore activée sur le serveur (script SQL à relancer).')
+    throw error
+  }
+  await supabase.auth.signOut().catch(() => {})
+  replaceData({ entries: {}, diary: [] })
+  ;['syncedUser', 'name', 'bio', 'avatar', 'top3'].forEach((k) => setSetting(k, k === 'top3' ? [] : ''))
+  setStatus({ user: null, state: 'idle', error: null })
 }

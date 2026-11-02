@@ -4,14 +4,14 @@ import * as rawg from './rawg.js'
 import * as mb from './musicbrainz.js'
 import * as dz from './deezer.js'
 import { DEMO, searchDemo } from './demo.js'
-import { getKey } from './keys.js'
+import { hasAccess } from './keys.js'
 import { ARTIFACT } from '../types.js'
 
 // La musique (MusicBrainz) n'a pas besoin de clé
 export function isLive(type) {
   if (ARTIFACT) return false
   if (type === 'album') return true
-  return Boolean(getKey(type === 'jeu' ? 'rawg' : 'tmdb'))
+  return hasAccess(type === 'jeu' ? 'rawg' : 'tmdb')
 }
 
 export function search(type, query) {

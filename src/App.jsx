@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import TabBar from './components/TabBar.jsx'
 import SearchBar from './components/SearchBar.jsx'
 import Browse from './pages/Browse.jsx'
@@ -12,6 +12,8 @@ import Settings from './pages/Settings.jsx'
 import Recap from './pages/Recap.jsx'
 import Top3 from './pages/Top3.jsx'
 import Artist from './pages/Artist.jsx'
+import NewPassword from './pages/NewPassword.jsx'
+import { MentionsLegales, Confidentialite } from './pages/Legal.jsx'
 import { ARTIFACT } from './types.js'
 
 export default function App() {
@@ -37,6 +39,9 @@ export default function App() {
           <Route path="/a-decouvrir" element={<Watchlist />} />
           <Route path="/profil" element={<Profile />} />
           <Route path="/bilan/:type" element={<Recap />} />
+          <Route path="/nouveau-mot-de-passe" element={<NewPassword />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route path="/confidentialite" element={<Confidentialite />} />
           <Route path="/artiste/:id" element={<Artist />} />
           <Route path="/top3" element={<Top3 />} />
           <Route path="/reglages" element={<Settings />} />
@@ -45,9 +50,23 @@ export default function App() {
         </Routes>
       </main>
       <footer className="footer">
-        {ARTIFACT
-          ? 'Version d\'essai avec un catalogue de démonstration. Tes notes restent dans ce navigateur.'
-          : 'Données : TMDB · RAWG · MusicBrainz. Ce produit utilise l\'API TMDB sans être approuvé ni certifié par TMDB.'}
+        {ARTIFACT ? (
+          "Version d'essai avec un catalogue de démonstration. Tes notes restent dans ce navigateur."
+        ) : (
+          <>
+            <p>
+              Données :{' '}
+              <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">TMDB</a> ·{' '}
+              <a href="https://rawg.io" target="_blank" rel="noreferrer">RAWG</a> ·{' '}
+              <a href="https://musicbrainz.org" target="_blank" rel="noreferrer">MusicBrainz</a> ·{' '}
+              <a href="https://www.deezer.com" target="_blank" rel="noreferrer">Deezer</a> · YouTube
+            </p>
+            <p>Ce produit utilise l'API TMDB sans être approuvé ni certifié par TMDB. Données de jeux fournies par RAWG.</p>
+            <p>
+              <Link to="/mentions-legales">Mentions légales</Link> · <Link to="/confidentialite">Confidentialité</Link>
+            </p>
+          </>
+        )}
       </footer>
       <SearchBar />
       <TabBar />

@@ -1,19 +1,15 @@
 // The Movie Database : films + séries — https://developer.themoviedb.org
-import { fetchJSON, getKey } from './keys.js'
+import { fetchJSON, apiURL } from './keys.js'
 
 const BASE = 'https://api.themoviedb.org/3'
 const IMG = 'https://image.tmdb.org/t/p/'
 const KIND = { film: 'movie', serie: 'tv' }
 
 function call(path, params = {}) {
-  const key = getKey('tmdb')
-  const url = new URL(BASE + path)
-  url.searchParams.set('language', 'fr-FR')
-  // une valeur vide retire le paramètre (ex. language: '' pour avoir les vidéos dans toutes les langues)
-  Object.entries(params).forEach(([k, v]) => (v === '' ? url.searchParams.delete(k) : url.searchParams.set(k, v)))
-  // Clé v3 courte -> paramètre d'URL ; "Read Access Token" (long) -> en-tête Authorization
+  const { url, key } = apiURL('tmdb', BASE, path, { language: 'fr-FR', ...params })
+  // Clé v3 courte -> paramètre d'URL ; "Read Access Token" (long) -> en-tête Authorization ; sans clé -> relais
   if (key.length > 40) return fetchJSON(url, { headers: { Authorization: `Bearer ${key}` } })
-  url.searchParams.set('api_key', key)
+  if (key) url.searchParams.set('api_key', key)
   return fetchJSON(url)
 }
 

@@ -1,12 +1,11 @@
 // RAWG : jeux vidéo — https://rawg.io/apidocs
-import { fetchJSON, getKey } from './keys.js'
+import { fetchJSON, apiURL } from './keys.js'
 
 const BASE = 'https://api.rawg.io/api'
 
 function call(path, params = {}) {
-  const url = new URL(BASE + path)
-  url.searchParams.set('key', getKey('rawg'))
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
+  const { url, key } = apiURL('rawg', BASE, path, params)
+  if (key) url.searchParams.set('key', key)
   return fetchJSON(url)
 }
 

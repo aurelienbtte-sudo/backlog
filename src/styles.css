@@ -634,3 +634,16 @@ button.top3-pick:disabled { opacity: .45; }
 .artist-top-title { display: flex; flex-direction: column; min-width: 0; color: var(--text); }
 .artist-top-title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 700px) { .artist-page { max-width: 860px; margin-inline: auto; } }
+
+/* Compte : champ piège anti-robots (invisible), zone de suppression */
+.trap { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.danger-zone { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; }
+.account-form .link-btn { align-self: flex-start; }
+
+/* Pages légales et pied de page */
+.legal { max-width: 720px; margin-inline: auto; }
+.legal h2 { margin-top: 1.6rem; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 1.1rem; }
+.legal p, .legal li { color: var(--text); line-height: 1.6; }
+.legal ul { padding-left: 1.2rem; }
+.footer p { margin: .3rem 0; }
+.footer a, .legal-links a { color: inherit; text-decoration: underline; }

@@ -13,7 +13,7 @@ const ITEMS = [
     to: '/',
     label: 'Accueil',
     color: 'var(--serie)',
-    match: (p) => p === '/' || p.startsWith('/bilan/') || p === '/top3' || ['/journal', '/a-decouvrir', '/profil', '/reglages'].includes(p),
+    match: (p) => p === '/' || p.startsWith('/bilan/') || ['/top3', '/mentions-legales', '/confidentialite', '/nouveau-mot-de-passe'].includes(p) || ['/journal', '/a-decouvrir', '/profil', '/reglages'].includes(p),
   },
 ]
 

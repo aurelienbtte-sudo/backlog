@@ -4,6 +4,8 @@ import { useStore, setSetting, exportData, importData, resetData } from '../stor
 import ConfirmButton from '../components/ConfirmButton.jsx'
 import { ARTIFACT } from '../types.js'
 import Account from '../components/Account.jsx'
+import { PROXY } from '../api/keys.js'
+import { Link } from 'react-router-dom'
 import Avatar from '../components/Avatar.jsx'
 import { SYNC_ENABLED } from '../sync.js'
 
@@ -76,7 +78,7 @@ export default function Settings() {
         {field('bio', 'Bio')}
       </section>
 
-      {!ARTIFACT && (
+      {!ARTIFACT && !PROXY && (
       <section className="card-box">
         <h2>Clés API (gratuites)</h2>
         <p className="muted small">
@@ -102,6 +104,7 @@ export default function Settings() {
         </div>
         {msg && <p className="small">{msg}</p>}
       </section>
+      <p className="muted small legal-links"><Link to="/mentions-legales">Mentions légales</Link> · <Link to="/confidentialite">Confidentialité</Link></p>
     </div>
   )
 }

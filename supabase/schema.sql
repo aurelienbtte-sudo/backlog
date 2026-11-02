@@ -61,3 +61,18 @@ create policy "own logs" on public.logs for all
 
 -- Accès aux tables pour les utilisateurs connectés (la sécurité ci-dessus limite chacun à ses données)
 grant select, insert, update, delete on public.profiles, public.entries, public.logs to authenticated;
+
+-- Suppression de compte : chaque utilisateur peut supprimer son propre compte.
+-- Son profil, ses notes et son journal sont effacés avec lui (« on delete cascade » plus haut).
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
