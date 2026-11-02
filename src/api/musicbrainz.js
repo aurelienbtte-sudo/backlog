@@ -62,6 +62,12 @@ const esc = (s) => s.replace(/"/g, '\\"')
 const albumQuery = ({ title, subtitle }) => `(releasegroup:"${esc(title)}" AND artist:"${esc(subtitle)}" AND primarytype:album)`
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+// Retrouve un album dans MusicBrainz à partir de son titre et de son artiste (null si introuvable)
+export async function findAlbum(title, artist) {
+  const data = await fetchJSON(`${BASE}/release-group?fmt=json&limit=10&query=${encodeURIComponent(albumQuery({ title, subtitle: artist }))}`)
+  return bestMatch(data['release-groups'], { title, subtitle: artist })?.id || null
+}
+
 // Parmi les résultats, celui qui correspond vraiment (même titre, même artiste), en préférant les albums
 function bestMatch(results, { title, subtitle }) {
   const matches = results.filter(

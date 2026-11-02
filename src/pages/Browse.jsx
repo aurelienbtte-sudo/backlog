@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { trending, isLive } from '../api/index.js'
+import { trending, isLive, musicNews, musicTop } from '../api/index.js'
 import { useStore, sortedDiary } from '../store.js'
 import { Grid } from '../components/MediaCard.jsx'
 import { TYPES, ARTIFACT } from '../types.js'
@@ -33,6 +33,7 @@ export default function Browse({ title, types }) {
     .map((l) => l.item)
 
   const live = isLive(type) && type !== 'album'
+  const music = type === 'album' && !ARTIFACT
 
   return (
     <>
@@ -58,9 +59,12 @@ export default function Browse({ title, types }) {
         </section>
       )}
 
+      {music && <FeedSection title="Nouveautés" load={musicNews} />}
+      {music && <FeedSection title="Les plus écoutés en ce moment" load={musicTop} />}
+
       <section>
         <div className="section-head">
-          <h2>{live ? 'Populaire en ce moment' : 'Sélection'}</h2>
+          <h2>{live ? 'Populaire en ce moment' : music ? 'Incontournables' : 'Sélection'}</h2>
         </div>
         {ARTIFACT && (
           <p className="notice">Version d'essai : choisis parmi ces {TYPES[type].label.toLowerCase()} de démonstration, ou utilise la recherche.</p>
@@ -73,5 +77,28 @@ export default function Browse({ title, types }) {
         {error ? <p className="error">{error}</p> : <Grid items={ARTIFACT ? items : items.slice(0, 20)} />}
       </section>
     </>
+  )
+}
+
+// Une rangée d'actualité (musique) : se cache toute seule si le service ne répond pas
+function FeedSection({ title, load }) {
+  const [items, setItems] = useState(null)
+  useEffect(() => {
+    let alive = true
+    load()
+      .then((r) => alive && setItems(r))
+      .catch(() => alive && setItems([]))
+    return () => {
+      alive = false
+    }
+  }, [load])
+  if (items && !items.length) return null
+  return (
+    <section>
+      <div className="section-head">
+        <h2>{title}</h2>
+      </div>
+      {items ? <Grid items={items.slice(0, 12)} /> : <p className="muted">Chargement…</p>}
+    </section>
   )
 }

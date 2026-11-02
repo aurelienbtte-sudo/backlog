@@ -2,9 +2,9 @@
 // Cette API n'autorise pas les appels directs depuis un site : on passe par un script (JSONP).
 const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
-function jsonp(url, timeout = 6000) {
+export function jsonp(url, timeout = 6000, service = 'Apple Music') {
   return new Promise((resolve, reject) => {
-    const name = `itunes_${Date.now()}_${Math.random().toString(36).slice(2)}`
+    const name = `jsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`
     const script = document.createElement('script')
     const cleanup = () => {
       delete window[name]
@@ -13,7 +13,7 @@ function jsonp(url, timeout = 6000) {
     }
     const timer = setTimeout(() => {
       cleanup()
-      reject(new Error('Apple Music ne répond pas'))
+      reject(new Error(`${service} ne répond pas`))
     }, timeout)
     window[name] = (data) => {
       cleanup()
@@ -22,7 +22,7 @@ function jsonp(url, timeout = 6000) {
     script.src = `${url}&callback=${name}`
     script.onerror = () => {
       cleanup()
-      reject(new Error('Apple Music injoignable'))
+      reject(new Error(`${service} injoignable`))
     }
     document.head.appendChild(script)
   })

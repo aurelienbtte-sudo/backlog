@@ -2,6 +2,7 @@
 import * as tmdb from './tmdb.js'
 import * as rawg from './rawg.js'
 import * as mb from './musicbrainz.js'
+import * as dz from './deezer.js'
 import { DEMO, searchDemo } from './demo.js'
 import { getKey } from './keys.js'
 import { ARTIFACT } from '../types.js'
@@ -35,6 +36,10 @@ export function getItem(type, sourceId) {
     return item ? Promise.resolve(item) : Promise.reject(new Error('Introuvable'))
   }
   if (type === 'jeu') return rawg.details(sourceId)
-  if (type === 'album') return mb.details(sourceId)
+  if (type === 'album') return sourceId.startsWith('dz-') ? dz.details(sourceId.slice(3)) : mb.details(sourceId)
   return tmdb.details(type, sourceId)
 }
+
+// Actualité musicale : nouveautés et albums les plus écoutés (Deezer)
+export const musicNews = () => dz.newReleases()
+export const musicTop = () => dz.topAlbums()
